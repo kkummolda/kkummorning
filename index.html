@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>꿈모닝 5분 피드백 | Chronos Zero</title>
+  <meta name="description" content="매일 밤 자기 전 5분, 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 웹 애플리케이션입니다.">
+  <meta name="theme-color" content="#0b0e17">
+  <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- TOP HEADER BAR (Chronos Zero Style Header) -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="logo-icon">🌙</div>
+        <div class="brand-text">
+          <h1>꿈모닝 <span class="highlight-text">5분 피드백</span></h1>
+        </div>
+      </div>
+
+      <!-- Center Navigation Links -->
+      <nav class="stepper-nav-header">
+        <button class="nav-link-btn active" data-step="1" id="tab-step-1">마음 보기</button>
+        <button class="nav-link-btn" data-step="2" id="tab-step-2">가치 생각</button>
+        <button class="nav-link-btn" data-step="3" id="tab-step-3">일일 피드백</button>
+        <button class="nav-link-btn" data-step="4" id="tab-step-4">21일 잔디 & 회고</button>
+      </nav>
+
+      <!-- Right Action Icons -->
+      <div class="header-status">
+        <div class="streak-badge" id="header-streak">
+          <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>일 연속
+        </div>
+        <div class="dday-pill" id="header-dday">
+          <span id="current-day-label">Day 1 / 21</span>
+        </div>
+        <button class="icon-btn audio-quick-toggle" id="quick-audio-btn" title="사운드 온/오프">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button class="icon-btn backup-btn" id="open-backup-btn" title="데이터 백업 및 설정">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Challenge Progress Bar -->
+    <div class="challenge-progress-bar-container">
+      <div class="progress-info">
+        <span>21일 목표 달성도</span>
+        <span id="progress-percent-text">0% (0 / 21일 완료)</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="challenge-progress-fill" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- MAIN VIEWS -->
+    <main class="main-content">
+      
+      <!-- STEP 1: 마음 보기 -->
+      <section class="step-view active" id="view-step-1">
+        <div class="chronos-banner-card">
+          <div class="step-badge">1단계: 마음 보기 (Mindfulness Process)</div>
+          <h2 class="chronos-banner-title">오늘 하루의 소음을 끄고, 차분하게 마음을 가다듬으세요</h2>
+          <p class="chronos-banner-desc">조용한 백색소음이나 힐링 오르골 톤을 틀어두고 깊은 호흡을 3회 진행해보세요.</p>
+
+          <div class="timer-ambient-grid">
+            <!-- Timer Circle -->
+            <div class="timer-container">
+              <svg class="timer-svg" viewBox="0 0 200 200">
+                <circle class="timer-bg-circle" cx="100" cy="100" r="88"></circle>
+                <circle class="timer-progress-circle" id="timer-ring" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="timer-display">
+                <span class="timer-time" id="timer-digits">05:00</span>
+                <span class="timer-subtext" id="timer-status">마음 보기 준비</span>
+              </div>
+            </div>
+
+            <!-- Sound Controls -->
+            <div class="sound-controls-card">
+              <h3><i class="fa-solid fa-music"></i> 힐링 미덕 사운드 선택</h3>
+              <div class="sound-preset-grid">
+                <button class="sound-chip active" data-sound="rain">
+                  <span class="chip-icon">🌧️</span>
+                  <span class="chip-title">차분한 밤 빗소리</span>
+                </button>
+                <button class="sound-chip" data-sound="forest">
+                  <span class="chip-icon">🌲</span>
+                  <span class="chip-title">숲속의 아늑한 바람</span>
+                </button>
+                <button class="sound-chip" data-sound="musicbox">
+                  <span class="chip-icon">🔮</span>
+                  <span class="chip-title">432Hz 명상 오르골</span>
+                </button>
+                <button class="sound-chip" data-sound="fire">
+                  <span class="chip-icon">🔥</span>
+                  <span class="chip-title">따뜻한 모닥불 장작</span>
+                </button>
+              </div>
+
+              <div class="volume-slider-wrapper">
+                <label for="volume-slider"><i class="fa-solid fa-volume-low"></i> 음량 조절</label>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.4">
+              </div>
+
+              <div class="timer-btn-group">
+                <button class="btn btn-primary btn-glow" id="start-timer-btn">
+                  <i class="fa-solid fa-play"></i> 5분 마음 보기 시작
+                </button>
+                <button class="btn btn-outline" id="pause-timer-btn" disabled>
+                  <i class="fa-solid fa-pause"></i> 일시정지
+                </button>
+                <button class="btn btn-outline" id="reset-timer-btn">
+                  <i class="fa-solid fa-rotate-left"></i> 리셋
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-footer-actions" style="margin-top: 24px; text-align: right;">
+            <button class="btn btn-engage" data-goto="2">
+              다음: 2단계 가치 생각하기 <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2: 가치 생각 -->
+      <section class="step-view" id="view-step-2">
+        <div class="chronos-banner-card">
+          <div class="step-badge">2단계: 가치 생각 (One Word Postcard)</div>
+          <h2 class="chronos-banner-title">나를 지탱하는 핵심 단어와 4가지 영역의 다짐</h2>
+          <p class="chronos-banner-desc">나답게 살아가는 핵심 키워드(One Word)와 4영역 다짐 카드입니다.</p>
+
+          <div class="postcard-container">
+            <!-- One-Word Card -->
+            <div class="oneword-postcard" id="oneword-card-element">
+              <div class="postcard-header">
+                <span class="postcard-tag">21-DAY CHALLENGE POSTCARD</span>
+                <span class="chronos-badge badge-blue">ENGAGED</span>
+              </div>
+              <div class="postcard-body">
+                <div class="oneword-label">나를 이끄는 방향 단어</div>
+                <h3 class="oneword-title" id="display-oneword">" 경청 "</h3>
+                <p class="oneword-quote" id="display-oneword-quote">타인의 소리와 내 영혼의 소리에 귀 기울이는 삶</p>
+              </div>
+              <div class="postcard-footer">
+                <span>작성자: <strong id="display-user-id">Dreamer</strong></span>
+                <button class="btn-text-edit" id="open-edit-goals-btn">
+                  <i class="fa-solid fa-pen"></i> 수정
+                </button>
+              </div>
+            </div>
+
+            <!-- 4 Goals Vector Grid (Chronos Style Vector Cards) -->
+            <div class="goals-overview-grid">
+              <div class="vector-card card-self">
+                <div class="vector-card-header">
+                  <span>자아 (Self)</span>
+                  <span class="chronos-badge badge-mint">ACTIVE</span>
+                </div>
+                <h4 class="vector-card-title">🌱 나다움 성찰</h4>
+                <p id="display-goal-self" style="font-size: 0.88rem; color: var(--text-muted);">매일 30분 독서 및 온전한 생각 정리</p>
+              </div>
+              
+              <div class="vector-card card-family">
+                <div class="vector-card-header">
+                  <span>가정 (Family)</span>
+                  <span class="chronos-badge badge-coral">PRIMARY</span>
+                </div>
+                <h4 class="vector-card-title">🏡 경청과 따뜻함</h4>
+                <p id="display-goal-family" style="font-size: 0.88rem; color: var(--text-muted);">가족과 따뜻한 저녁 식사와 깊은 경청</p>
+              </div>
+
+              <div class="vector-card card-society">
+                <div class="vector-card-header">
+                  <span>사회 (Society)</span>
+                  <span class="chronos-badge badge-blue">FOCUS</span>
+                </div>
+                <h4 class="vector-card-title">🏢 사회적 기여</h4>
+                <p id="display-goal-society" style="font-size: 0.88rem; color: var(--text-muted);">동료의 이야기를 먼저 끝까지 경청하기</p>
+              </div>
+
+              <div class="vector-card card-soul">
+                <div class="vector-card-header">
+                  <span>영혼 (Soul)</span>
+                  <span class="chronos-badge badge-mint">BALANCED</span>
+                </div>
+                <h4 class="vector-card-title">✨ 내면의 평온</h4>
+                <p id="display-goal-soul" style="font-size: 0.88rem; color: var(--text-muted);">하루 5분 호흡과 명상으로 평온 지키기</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; justify-content: space-between;">
+            <button class="btn btn-outline" data-goto="1">
+              <i class="fa-solid fa-arrow-left"></i> 이전: 1단계
+            </button>
+            <button class="btn btn-engage" data-goto="3">
+              다음: 3단계 일일 피드백 작성 <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3: 일일 피드백 (Exact Chronos "Initialize New Vector" Form Banner) -->
+      <section class="step-view" id="view-step-3">
+        
+        <!-- Chronos "Initialize New Vector" Style Banner -->
+        <div class="chronos-banner-card">
+          <h2 class="chronos-banner-title">Initialize Daily Reflection</h2>
+          <p class="chronos-banner-desc">매일 밤 5분, 각 영역별 성찰과 오늘 하루 한 문장 정의를 등록하세요.</p>
+          
+          <div class="chronos-input-bar">
+            <div class="input-field-group">
+              <label for="feedback-date">Target Reflection Date</label>
+              <input type="date" id="feedback-date" class="chronos-input">
+            </div>
+
+            <div class="input-field-group">
+              <label>Current Status</label>
+              <div style="padding: 10px 0;">
+                <span class="chronos-badge badge-blue" id="selected-day-badge">Day 1</span>
+              </div>
+            </div>
+
+            <button class="btn-engage" id="save-daily-btn">
+              <i class="fa-solid fa-plus"></i> + Engage Log
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Area Feedback Vector Input Cards -->
+        <div class="feedback-cards-grid">
+          
+          <!-- 자아 (Self) -->
+          <div class="area-card area-card-self">
+            <div class="area-card-header">
+              <div class="area-title-group">
+                <h3>🌱 자아 피드백</h3>
+              </div>
+              <span class="chronos-badge badge-mint" id="counter-self">0자</span>
+            </div>
+            <div class="quick-chips" data-target="self-feedback">
+              <span class="chip">+ 내 감정에 솔직했다</span>
+              <span class="chip">+ 독서 30분 달성</span>
+              <span class="chip">+ 나를 칭찬했다</span>
+            </div>
+            <textarea id="self-feedback" placeholder="오늘 나 자신을 위해 잘한 점, 부족했던 점, 내일의 다짐을 적어보세요..." rows="3"></textarea>
+          </div>
+
+          <!-- 가정 (Family) -->
+          <div class="area-card area-card-family">
+            <div class="area-card-header">
+              <div class="area-title-group">
+                <h3>🏡 가정 피드백</h3>
+              </div>
+              <span class="chronos-badge badge-coral" id="counter-family">0자</span>
+            </div>
+            <div class="quick-chips" data-target="family-feedback">
+              <span class="chip">+ 가족의 말 경청했다</span>
+              <span class="chip">+ 고마움 표현했다</span>
+              <span class="chip">+ 함께 웃었다</span>
+            </div>
+            <textarea id="family-feedback" placeholder="가족이나 소중한 사람과의 대화, 관계에서의 성찰을 기록해 보세요..." rows="3"></textarea>
+          </div>
+
+          <!-- 사회 (Society) -->
+          <div class="area-card area-card-society">
+            <div class="area-card-header">
+              <div class="area-title-group">
+                <h3>🏢 사회 피드백</h3>
+              </div>
+              <span class="chronos-badge badge-blue" id="counter-society">0자</span>
+            </div>
+            <div class="quick-chips" data-target="society-feedback">
+              <span class="chip">+ 할 일 마무리했다</span>
+              <span class="chip">+ 동료를 도왔다</span>
+              <span class="chip">+ 배려 실천했다</span>
+            </div>
+            <textarea id="society-feedback" placeholder="오늘의 일터와 관계 속에서 보람을 느꼈거나 개선하고 싶은 점을 적으세요..." rows="3"></textarea>
+          </div>
+
+          <!-- 영혼 (Soul) -->
+          <div class="area-card area-card-soul">
+            <div class="area-card-header">
+              <div class="area-title-group">
+                <h3>✨ 영혼 피드백</h3>
+              </div>
+              <span class="chronos-badge badge-mint" id="counter-soul">0자</span>
+            </div>
+            <div class="quick-chips" data-target="soul-feedback">
+              <span class="chip">+ 평온을 찾았다</span>
+              <span class="chip">+ 집착하지 않았다</span>
+              <span class="chip">+ 무사함에 감사했다</span>
+            </div>
+            <textarea id="soul-feedback" placeholder="내 마음과 영혼의 상태, 순간의 감사와 평온했던 순간을 적어보세요..." rows="3"></textarea>
+          </div>
+
+        </div>
+
+        <!-- One Sentence Summary Vector Ribbon -->
+        <div class="one-sentence-section">
+          <div class="sentence-phrase">
+            <span>오늘 나의 하루는</span>
+            <input type="text" id="one-sentence-summary" placeholder="나의 소리를 조용히 찾아가는 하루" maxlength="60">
+            <span>이었다.</span>
+          </div>
+          <div class="sentence-preview-box">
+            <p id="sentence-preview-text">" 오늘 나의 하루는 <u>나의 소리를 조용히 찾아가는 하루</u> 이었다. "</p>
+          </div>
+        </div>
+
+        <!-- Footer Actions Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div id="autosave-indicator" style="font-size: 0.8rem; color: var(--text-dim);">
+            <i class="fa-solid fa-cloud-arrow-up"></i> 자동 임시 저장됨
+          </div>
+          <div>
+            <button class="btn btn-outline" data-goto="2">이전 2단계</button>
+            <button class="btn btn-engage" id="save-daily-btn-bottom">+ Save Feedback</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: DASHBOARD (21-Day Habit Vector Cards) -->
+      <section class="step-view" id="view-step-4">
+        
+        <!-- Header Banner -->
+        <div class="chronos-banner-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 class="chronos-banner-title">Habit Matrix Dashboard</h2>
+              <p class="chronos-banner-desc">21일간의 성찰 잔디와 연승 현황을 추적합니다.</p>
+            </div>
+            <button class="btn btn-engage" id="view-comprehensive-reflection-btn">
+              <i class="fa-solid fa-trophy"></i> 21일 종합 회고서
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Grid (Chronos Floating Cards Style) -->
+        <div class="dashboard-stats-grid">
+          <div class="vector-card card-self">
+            <div class="vector-card-header">
+              <span>PROGRESS</span>
+              <span class="chronos-badge badge-blue">D-DAY</span>
+            </div>
+            <div class="stat-value" id="stat-completed-days">0 / 21일</div>
+          </div>
+
+          <div class="vector-card card-family">
+            <div class="vector-card-header">
+              <span>STREAK</span>
+              <span class="chronos-badge badge-coral">FIRE</span>
+            </div>
+            <div class="stat-value" id="stat-streak-count">0일</div>
+          </div>
+
+          <div class="vector-card card-society">
+            <div class="vector-card-header">
+              <span>COMPLETION</span>
+              <span class="chronos-badge badge-blue">RATE</span>
+            </div>
+            <div class="stat-value" id="stat-completion-rate">0%</div>
+          </div>
+
+          <div class="vector-card card-soul">
+            <div class="vector-card-header">
+              <span>TOTAL LOGS</span>
+              <span class="chronos-badge badge-mint">CHARS</span>
+            </div>
+            <div class="stat-value" id="stat-total-words">0자</div>
+          </div>
+        </div>
+
+        <!-- 21-Day Contribution Grass Grid -->
+        <div class="chronos-banner-card" style="margin-bottom: 28px;">
+          <h3 style="font-size: 1.1rem; margin-bottom: 16px;">21-Day Habit Vector Grid</h3>
+          <div class="grass-grid" id="grass-grid-container">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Entries Log -->
+        <div class="chronos-banner-card">
+          <h3 style="font-size: 1.1rem; margin-bottom: 16px;">Past Vector Logs</h3>
+          <div id="entries-log-list" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER (Matching screenshot bottom text) -->
+    <footer class="chronos-footer">
+      <span>© 2026 Dream Morning Command</span>
+      <span>·</span>
+      <a href="#">Privacy</a>
+      <span>·</span>
+      <a href="#">Terms</a>
+      <span>·</span>
+      <a href="#">Support</a>
+    </footer>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="edit-goals-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>원워드 & 4영역 다짐 설정</h3>
+        <button class="modal-close-btn" id="close-goals-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">작성자 닉네임</label>
+          <input type="text" id="input-user-name" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">나의 원워드 (One Word)</label>
+          <input type="text" id="input-oneword" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">단어 의미</label>
+          <input type="text" id="input-oneword-quote" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 16px 0;">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">🌱 자아 다짐</label>
+          <input type="text" id="input-goal-self" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">🏡 가정 다짐</label>
+          <input type="text" id="input-goal-family" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">🏢 사회 다짐</label>
+          <input type="text" id="input-goal-society" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">✨ 영혼 다짐</label>
+          <input type="text" id="input-goal-soul" class="chronos-input" style="width: 100%; min-width: auto;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancel-goals-modal">취소</button>
+        <button class="btn btn-engage" id="save-goals-modal-btn">설정 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="comprehensive-reflection-modal">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3>🎉 21일 완주! 4영역 종합 회고 리포트</h3>
+        <button class="modal-close-btn" id="close-reflection-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <h2 id="reflection-user-title" style="margin-bottom: 16px;">Dreamer 님의 21일 성찰 종합 리포트</h2>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
+          <div class="vector-card card-self">
+            <h4>🌱 21일간 자아 성찰</h4>
+            <div id="reflection-summary-self" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;"></div>
+          </div>
+          <div class="vector-card card-family">
+            <h4>🏡 21일간 가정 성찰</h4>
+            <div id="reflection-summary-family" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;"></div>
+          </div>
+          <div class="vector-card card-society">
+            <h4>🏢 21일간 사회 성찰</h4>
+            <div id="reflection-summary-society" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;"></div>
+          </div>
+          <div class="vector-card card-soul">
+            <h4>✨ 21일간 영혼 성찰</h4>
+            <div id="reflection-summary-soul" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 8px;"></div>
+          </div>
+        </div>
+        <div class="sentence-preview-box" style="text-align: center;">
+          <p id="reflection-best-sentence">" 나의 소리를 조용히 찾아가는 하루였다. "</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="print-reflection-btn"><i class="fa-solid fa-print"></i> 인쇄 / PDF 저장</button>
+        <button class="btn btn-engage" id="close-reflection-modal-btn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="backup-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>데이터 백업 & 설정</h3>
+        <button class="modal-close-btn" id="close-backup-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted);">작성한 데이터를 JSON 파일로 백업하거나 불러올 수 있습니다.</p>
+        <button class="btn btn-outline" id="export-json-btn" style="width: 100%; margin-bottom: 12px;"><i class="fa-solid fa-download"></i> JSON 백업 다운로드</button>
+        <input type="file" id="import-json-file" accept=".json" style="display: none;">
+        <button class="btn btn-outline" id="import-json-btn" style="width: 100%; margin-bottom: 12px;"><i class="fa-solid fa-upload"></i> JSON 파일 복원</button>
+        <button class="btn btn-outline" id="reset-all-data-btn" style="width: 100%; color: var(--accent-coral); border-color: rgba(248, 113, 113, 0.3);">전체 데이터 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
