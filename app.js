@@ -9,6 +9,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
   const STORAGE_KEY = 'dream_morning_5min_data_v1';
 
+  // Global Loading Overlay Helpers
+  function showGlobalLoading(text = '처리 중입니다...') {
+    const overlay = document.getElementById('global-loading-overlay');
+    const label = document.getElementById('global-loading-text');
+    if (label) label.textContent = text;
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+  function hideGlobalLoading() {
+    const overlay = document.getElementById('global-loading-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
   // Helper: Get local date string YYYY-MM-DD (KST/Local Timezone Safe)
   function getLocalDateString(d = new Date()) {
     const year = d.getFullYear();
