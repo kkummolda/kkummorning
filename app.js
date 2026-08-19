@@ -792,7 +792,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tile.innerHTML = `
         <div class="grass-tile-day">Day ${day}</div>
-        <div class="grass-tile-status">${log ? '<svg class="icon"><use href="#icon-sparkle"></use></svg>' : '<svg class="icon" style="opacity:0.35"><use href="#icon-leaf"></use></svg>'}</div>
         <div class="grass-tile-date">${log ? log.date.slice(5) : ''}</div>
       `;
 
