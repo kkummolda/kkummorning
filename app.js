@@ -1230,8 +1230,12 @@ document.addEventListener('DOMContentLoaded', () => {
       
       updateAuthUI(data.user);
       showToast(`${data.user.email} 님 환영합니다! 🎉`, 'success');
-      document.getElementById('auth-modal').classList.remove('active');
+      window.closeAuthModal();
       await loadDataFromSupabase(data.user.id);
+      
+      // Auto transition to Mindfulness & Writing Section
+      const tab1Btn = document.querySelector('[data-step="1"]');
+      if (tab1Btn) tab1Btn.click();
     } catch (err) {
       console.error('Sign in error:', err);
       showToast(`로그인 안내: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
@@ -1243,10 +1247,12 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleSignUp(email, password, userName) {
     if (!supabaseClient) {
       showToast('🔑 Supabase API Key가 설정되지 않았습니다. ⚙️ 설정 창에서 Key를 붙여넣고 [연동 및 저장]을 누른 뒤 다시 시도해 주세요.', 'error');
-      const authModal = document.getElementById('auth-modal');
-      if (authModal) authModal.classList.remove('active');
+      window.closeAuthModal();
       const backupModal = document.getElementById('backup-modal');
-      if (backupModal) backupModal.classList.add('active');
+      if (backupModal) {
+        backupModal.classList.add('active');
+        backupModal.style.display = 'flex';
+      }
       return;
     }
 
@@ -1276,8 +1282,11 @@ document.addEventListener('DOMContentLoaded', () => {
           currentUser = signInData.user;
           updateAuthUI(signInData.user);
           showToast(`${userName || email} 님 로그인되었습니다! 🎉`, 'success');
-          document.getElementById('auth-modal').classList.remove('active');
+          window.closeAuthModal();
           await loadDataFromSupabase(signInData.user.id);
+          
+          const tab1Btn = document.querySelector('[data-step="1"]');
+          if (tab1Btn) tab1Btn.click();
           return;
         }
       } else if (error) {
@@ -1333,9 +1342,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI();
 
         showToast(`${userName || email} 님 회원가입이 완료되었습니다! 🚀`, 'success');
-        const authModal = document.getElementById('auth-modal');
-        if (authModal) authModal.classList.remove('active');
+        window.closeAuthModal();
         await loadDataFromSupabase(data.user.id);
+
+        const tab1Btn = document.querySelector('[data-step="1"]');
+        if (tab1Btn) tab1Btn.click();
       }
     } catch (err) {
       console.error('Sign up error:', err);
@@ -1582,10 +1593,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Auth Modal Controls (Exposed globally for instant inline onclick support)
+  // Auth Modal Controls (Exposed globally)
   window.openAuthModal = function() {
     console.log('openAuthModal triggered');
-    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+      m.classList.remove('active');
+      m.style.display = 'none';
+    });
     const modal = document.getElementById('auth-modal');
     if (modal) {
       modal.classList.add('active');
@@ -1593,21 +1607,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  window.closeAuthModal = function() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+  };
+
   const openAuthBtn = document.getElementById('open-auth-modal-btn');
   if (openAuthBtn) openAuthBtn.addEventListener('click', window.openAuthModal);
 
   const closeAuthBtn = document.getElementById('close-auth-modal');
-  if (closeAuthBtn) {
-    closeAuthBtn.addEventListener('click', () => {
-      document.getElementById('auth-modal').classList.remove('active');
-    });
-  }
+  if (closeAuthBtn) closeAuthBtn.addEventListener('click', window.closeAuthModal);
 
   const closeWelcomeBtn = document.getElementById('close-welcome-modal');
   if (closeWelcomeBtn) {
     closeWelcomeBtn.addEventListener('click', () => {
       const welcomeModal = document.getElementById('user-welcome-modal');
-      if (welcomeModal) welcomeModal.classList.remove('active');
+      if (welcomeModal) {
+        welcomeModal.classList.remove('active');
+        welcomeModal.style.display = 'none';
+      }
     });
   }
 
@@ -1615,8 +1636,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (welcomeToAuthBtn) {
     welcomeToAuthBtn.addEventListener('click', () => {
       const welcomeModal = document.getElementById('user-welcome-modal');
-      if (welcomeModal) welcomeModal.classList.remove('active');
-      openAuthModal();
+      if (welcomeModal) {
+        welcomeModal.classList.remove('active');
+        welcomeModal.style.display = 'none';
+      }
+      window.openAuthModal();
     });
   }
 
