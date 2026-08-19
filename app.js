@@ -9,35 +9,73 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
   const STORAGE_KEY = 'dream_morning_5min_data_v1';
 
-  const defaultState = {
-    user_profile: {
-      user_id: 'Dreamer',
-      one_word: '경청',
-      one_word_quote: '타인의 소리와 내 영혼의 소리에 귀 기울이는 삶',
-      challenge_start_date: new Date().toISOString().split('T')[0],
-      four_area_goals: {
-        self: '매일 30분 독서 및 온전한 생각 정리',
-        family: '가족과 따뜻한 저녁 식사와 깊은 경청',
-        society: '동료의 이야기를 먼저 끝까지 경청하기',
-        soul: '하루 5분 호흡과 명상으로 평온 지키기'
-      }
-    },
-    sound_settings: {
-      sound_type: 'rain',
-      volume: 0.4
-    },
-    daily_logs: [
-      {
-        day: 1,
-        date: new Date().toISOString().split('T')[0],
-        self_feedback: '감정에 휘둘리지 않고 나만의 중심을 지켰다.',
-        family_feedback: '가족의 마음에 귀 기울이며 이야기를 경청해주었다.',
-        society_feedback: '회의 시간에 다른 사람의 말을 먼저 듣는 태도를 가졌다.',
-        soul_feedback: '잠시 숨을 고르고 내면의 호흡에 집중하여 평온을 얻었다.',
-        one_sentence_summary: '나의 소리를 조용히 찾아가는 하루'
-      }
-    ]
-  };
+  // Helper: Get local date string YYYY-MM-DD (KST/Local Timezone Safe)
+  function getLocalDateString(d = new Date()) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function createDefaultState() {
+    return {
+      user_profile: {
+        user_id: '드림러',
+        one_word: '경청',
+        one_word_quote: '타인의 소리와 내 영혼의 소리에 귀 기울이는 삶',
+        challenge_start_date: getLocalDateString(),
+        four_area_goals: {
+          self: '매일 30분 독서 및 온전한 생각 정리',
+          family: '가족과 따뜻한 저녁 식사와 깊은 경청',
+          society: '동료의 이야기를 먼저 끝까지 경청하기',
+          soul: '하루 5분 호흡과 명상으로 평온 지키기'
+        }
+      },
+      sound_settings: {
+        sound_type: 'rain',
+        volume: 0.4
+      },
+      daily_logs: []
+    };
+  }
+
+  function getSampleState() {
+    const today = new Date();
+    const logs = [];
+    for (let i = 1; i <= 7; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - (7 - i));
+      const dateStr = getLocalDateString(d);
+      logs.push({
+        day: i,
+        date: dateStr,
+        created_at: d.toISOString(),
+        self_feedback: `${i}일차: 내 감정에 휘둘리지 않고 나만의 중심을 지켰다.`,
+        family_feedback: `${i}일차: 가족의 마음에 귀 기울이며 이야기를 경청해주었다.`,
+        society_feedback: `${i}일차: 회의 시간에 다른 사람의 말을 먼저 듣는 태도를 가졌다.`,
+        soul_feedback: `${i}일차: 잠시 숨을 고르고 내면의 호흡에 집중하여 평온을 얻었다.`,
+        one_sentence_summary: `${i}일차: 나의 소리를 조용히 찾아가는 하루`
+      });
+    }
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 6);
+    return {
+      user_profile: {
+        user_id: 'Dreamer (가상)',
+        one_word: '경청',
+        one_word_quote: '타인의 소리와 내 영혼의 소리에 귀 기울이는 삶',
+        challenge_start_date: getLocalDateString(startDate),
+        four_area_goals: {
+          self: '매일 30분 독서 및 온전한 생각 정리',
+          family: '가족과 따뜻한 저녁 식사와 깊은 경청',
+          society: '동료의 이야기를 먼저 끝까지 경청하기',
+          soul: '하루 5분 호흡과 명상으로 평온 지키기'
+        }
+      },
+      sound_settings: { sound_type: 'rain', volume: 0.4 },
+      daily_logs: logs
+    };
+  }
 
   let state = loadState();
 
@@ -50,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
       console.warn('Failed to load state from localStorage:', e);
     }
-    return defaultState;
+    return createDefaultState();
   }
 
   function saveState() {
@@ -145,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stopAmbientSound();
 
     if (type === 'rain') {
-      // Pink Noise Rain Sound Generator
+      // 1. Continuous Rain Noise Layer (Pink Noise)
       const bufferSize = audioCtx.sampleRate * 2;
       const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const output = noiseBuffer.getChannelData(0);
@@ -159,92 +197,180 @@ document.addEventListener('DOMContentLoaded', () => {
         b4 = 0.55000 * b4 + white * 0.5329522;
         b5 = -0.7616 * b5 - white * 0.0168980;
         output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        output[i] *= 0.08;
+        output[i] *= 0.1;
         b6 = white * 0.115926;
       }
 
-      const whiteNoise = audioCtx.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
+      const rainSource = audioCtx.createBufferSource();
+      rainSource.buffer = noiseBuffer;
+      rainSource.loop = true;
 
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 1000;
+      const rainFilter = audioCtx.createBiquadFilter();
+      rainFilter.type = 'lowpass';
+      rainFilter.frequency.value = 1400;
 
-      whiteNoise.connect(filter);
-      filter.connect(masterGain);
-      whiteNoise.start();
+      rainSource.connect(rainFilter);
+      rainFilter.connect(masterGain);
+      rainSource.start();
 
-      currentSoundNodes.push(whiteNoise);
+      // 2. Random Raindrop Clicks Generator
+      const dropInterval = setInterval(() => {
+        if (!isAudioPlaying) return;
+        const dropOsc = audioCtx.createOscillator();
+        const dropGain = audioCtx.createGain();
+        dropOsc.type = 'sine';
+        const dropFreq = 2000 + Math.random() * 3000;
+        dropOsc.frequency.setValueAtTime(dropFreq, audioCtx.currentTime);
+        dropGain.gain.setValueAtTime(0.015 + Math.random() * 0.02, audioCtx.currentTime);
+        dropGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.03);
+
+        dropOsc.connect(dropGain);
+        dropGain.connect(masterGain);
+        dropOsc.start();
+        dropOsc.stop(audioCtx.currentTime + 0.035);
+      }, 100);
+
+      currentSoundNodes.push(rainSource, { stop: () => clearInterval(dropInterval) });
+
     } else if (type === 'forest') {
-      // Forest Wind & Deep Pad
-      const osc = audioCtx.createOscillator();
-      const oscGain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(110, audioCtx.currentTime); // A2
+      // 1. Modulated Forest Wind Sweep
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = (Math.random() * 2 - 1) * 0.08;
+      }
 
+      const windNoise = audioCtx.createBufferSource();
+      windNoise.buffer = noiseBuffer;
+      windNoise.loop = true;
+
+      const windFilter = audioCtx.createBiquadFilter();
+      windFilter.type = 'bandpass';
+      windFilter.Q.value = 2.0;
+      windFilter.frequency.setValueAtTime(450, audioCtx.currentTime);
+
+      // LFO for natural wind frequency swells
       const lfo = audioCtx.createOscillator();
-      lfo.frequency.value = 0.2; // Slow wind modulation
+      lfo.frequency.value = 0.15; // Slow breeze pulse
       const lfoGain = audioCtx.createGain();
-      lfoGain.gain.value = 10;
-      lfo.connect(osc.frequency);
+      lfoGain.gain.value = 250;
+      lfo.connect(windFilter.frequency);
 
-      oscGain.gain.value = 0.12;
-      osc.connect(oscGain);
-      oscGain.connect(masterGain);
+      windNoise.connect(windFilter);
+      windFilter.connect(masterGain);
 
-      osc.start();
+      windNoise.start();
       lfo.start();
-      currentSoundNodes.push(osc, lfo);
+
+      // 2. Warm Ambient Synth Pad (A2 / E3 / A3)
+      const padFreqs = [110, 164.81, 220];
+      const padGain = audioCtx.createGain();
+      padGain.gain.value = 0.04;
+      const padOscs = padFreqs.map(f => {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        osc.connect(padGain);
+        osc.start();
+        return osc;
+      });
+      padGain.connect(masterGain);
+
+      currentSoundNodes.push(windNoise, lfo, padGain, ...padOscs);
+
     } else if (type === 'musicbox') {
-      // 432Hz Meditation Music Box Arpeggiator
-      const scale = [216, 270, 324, 432, 540, 648]; // 432Hz harmonic scale
-      let noteIndex = 0;
+      // 432Hz Sacred Frequency Meditation Music Box with Delay Echo
+      const delay = audioCtx.createDelay();
+      delay.delayTime.value = 0.38;
+      const feedback = audioCtx.createGain();
+      feedback.gain.value = 0.35;
+      delay.connect(feedback);
+      feedback.connect(delay);
+      delay.connect(masterGain);
+
+      const scale = [216, 270, 324, 432, 540, 648, 864]; // 432Hz A-major pentatonic scale
+      let step = 0;
 
       const musicInterval = setInterval(() => {
         if (!isAudioPlaying) {
           clearInterval(musicInterval);
           return;
         }
-        const freq = scale[noteIndex % scale.length];
-        noteIndex = Math.floor(Math.random() * scale.length);
+        const freq = scale[step % scale.length];
+        step = (step + Math.floor(Math.random() * 3) + 1) % scale.length;
 
-        const osc = audioCtx.createOscillator();
+        // Dual Oscillator: Sine (fundamental) + Triangle (bell overtone)
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
         const noteGain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
-        noteGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.5);
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(freq * 2, audioCtx.currentTime);
 
-        osc.connect(noteGain);
+        const now = audioCtx.currentTime;
+        noteGain.gain.setValueAtTime(0.001, now);
+        noteGain.gain.linearRampToValueAtTime(0.12, now + 0.015); // Fast attack
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0); // Long music box ring
+
+        osc1.connect(noteGain);
+        osc2.connect(noteGain);
         noteGain.connect(masterGain);
+        noteGain.connect(delay);
 
-        osc.start();
-        osc.stop(audioCtx.currentTime + 2.6);
-      }, 1200);
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 3.1);
+        osc2.stop(now + 3.1);
+      }, 1000);
 
-      currentSoundNodes.push({ stop: () => clearInterval(musicInterval) });
+      currentSoundNodes.push({ stop: () => clearInterval(musicInterval) }, delay, feedback);
+
     } else if (type === 'fire') {
-      // Campfire Low Warm Synth
-      const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
-      const fireGain = audioCtx.createGain();
+      // 1. Warm Fire Deep Ember Rumble
+      const osc = audioCtx.createOscillator();
+      const oscGain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = 75; // Low warmth D2
+      oscGain.gain.value = 0.08;
+      osc.connect(oscGain);
+      oscGain.connect(masterGain);
+      osc.start();
 
-      osc1.type = 'triangle';
-      osc1.frequency.value = 73.42; // D2
-      osc2.type = 'sine';
-      osc2.frequency.value = 110;
+      // 2. Wood Crackle & Pop Impulses
+      const crackleInterval = setInterval(() => {
+        if (!isAudioPlaying) return;
 
-      fireGain.gain.value = 0.15;
+        // Random chance for crackle pop
+        if (Math.random() < 0.65) {
+          const bufferSize = audioCtx.sampleRate * 0.02; // 20ms burst
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+          }
 
-      osc1.connect(fireGain);
-      osc2.connect(fireGain);
-      fireGain.connect(masterGain);
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
 
-      osc1.start();
-      osc2.start();
-      currentSoundNodes.push(osc1, osc2);
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'highpass';
+          filter.frequency.value = 1200 + Math.random() * 2500;
+
+          const crackleGain = audioCtx.createGain();
+          crackleGain.gain.value = 0.03 + Math.random() * 0.08;
+
+          noise.connect(filter);
+          filter.connect(crackleGain);
+          crackleGain.connect(masterGain);
+
+          noise.start();
+        }
+      }, 120);
+
+      currentSoundNodes.push(osc, oscGain, { stop: () => clearInterval(crackleInterval) });
     }
 
     isAudioPlaying = true;
@@ -387,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. STEPPER NAVIGATION & VIEW SWITCHING
   // ------------------------------------------------------------------------
   function switchStep(stepNum) {
-    document.querySelectorAll('.step-tab-btn, .nav-link-btn').forEach(btn => {
+    document.querySelectorAll('.step-tab-btn, .nav-link-btn, .bottom-nav-btn').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-step') == stepNum);
     });
 
@@ -399,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  document.querySelectorAll('.step-tab-btn, .nav-link-btn').forEach(btn => {
+  document.querySelectorAll('.step-tab-btn, .nav-link-btn, .bottom-nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const step = btn.getAttribute('data-step');
       switchStep(step);
@@ -425,8 +551,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const summaryInput = document.getElementById('one-sentence-summary');
   const sentencePreview = document.getElementById('sentence-preview-text');
 
-  // Set default date to today
-  const todayStr = new Date().toISOString().split('T')[0];
+  // Set default date to today (Local Timezone)
+  const todayStr = getLocalDateString();
   feedbackDateInput.value = todayStr;
 
   function getLogForDate(dateStr) {
@@ -435,6 +561,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function populateFeedbackForm(dateStr) {
     const existingLog = getLogForDate(dateStr);
+    const deleteBtn = document.getElementById('delete-daily-btn');
+    if (deleteBtn) {
+      deleteBtn.style.display = existingLog ? 'inline-flex' : 'none';
+    }
     
     // Calculate Day N relative to challenge start
     const startDate = new Date(state.user_profile.challenge_start_date);
@@ -560,6 +690,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Delete Daily Feedback Function
+  function deleteDailyFeedback() {
+    const dateStr = feedbackDateInput.value;
+    const logIndex = state.daily_logs.findIndex(l => l.date === dateStr);
+
+    if (logIndex >= 0) {
+      if (confirm(`${dateStr} 피드백 기록을 정말 삭제하시겠습니까?`)) {
+        state.daily_logs.splice(logIndex, 1);
+        saveState();
+        showToast(`${dateStr} 피드백이 삭제되었습니다.`, 'info');
+      }
+    }
+  }
+
+  const deleteBtn = document.getElementById('delete-daily-btn');
+  if (deleteBtn) deleteBtn.addEventListener('click', deleteDailyFeedback);
+
   const saveBtn1 = document.getElementById('save-daily-btn');
   const saveBtn2 = document.getElementById('save-daily-btn-bottom');
   if (saveBtn1) saveBtn1.addEventListener('click', saveDailyFeedback);
@@ -648,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
   const editGoalsModal = document.getElementById('edit-goals-modal');
 
-  document.getElementById('open-edit-goals-btn').addEventListener('click', () => {
+  function openGoalsModal(focusTarget = null) {
     document.getElementById('input-user-name').value = state.user_profile.user_id;
     document.getElementById('input-oneword').value = state.user_profile.one_word;
     document.getElementById('input-oneword-quote').value = state.user_profile.one_word_quote;
@@ -658,7 +805,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('input-goal-soul').value = state.user_profile.four_area_goals.soul;
 
     editGoalsModal.classList.add('active');
+
+    if (focusTarget) {
+      const targetInput = document.getElementById(`input-goal-${focusTarget}`) || 
+                          document.getElementById(`input-${focusTarget}`);
+      if (targetInput) {
+        setTimeout(() => {
+          targetInput.focus();
+          targetInput.select();
+        }, 100);
+      }
+    }
+  }
+
+  document.getElementById('open-edit-goals-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openGoalsModal('oneword');
   });
+
+  // Allow clicking any Step 2 Card or Edit Button to open modal directly
+  document.querySelectorAll('[data-edit-target]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const target = el.getAttribute('data-edit-target');
+      openGoalsModal(target);
+    });
+  });
+
+  const postcardElement = document.getElementById('oneword-card-element');
+  if (postcardElement) {
+    postcardElement.style.cursor = 'pointer';
+    postcardElement.addEventListener('click', (e) => {
+      if (!e.target.closest('#open-edit-goals-btn')) {
+        openGoalsModal('oneword');
+      }
+    });
+  }
 
   document.getElementById('close-goals-modal').addEventListener('click', () => {
     editGoalsModal.classList.remove('active');
@@ -668,7 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('save-goals-modal-btn').addEventListener('click', () => {
-    state.user_profile.user_id = document.getElementById('input-user-name').value.trim() || 'Dreamer';
+    state.user_profile.user_id = document.getElementById('input-user-name').value.trim() || '드림러';
     state.user_profile.one_word = document.getElementById('input-oneword').value.trim() || '경청';
     state.user_profile.one_word_quote = document.getElementById('input-oneword-quote').value.trim() || '나다움을 찾아가는 삶';
     state.user_profile.four_area_goals.self = document.getElementById('input-goal-self').value.trim();
@@ -786,11 +968,31 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsText(file);
   });
 
+  // Start New 21-Day Challenge
+  document.getElementById('start-new-challenge-btn').addEventListener('click', () => {
+    if (confirm('새로운 21일 챌린지를 시작하시겠습니까? (기존 기록이 초기화됩니다)')) {
+      state = createDefaultState();
+      saveState();
+      backupModal.classList.remove('active');
+      showToast('새 21일 챌린지가 시작되었습니다! 🎯 2단계에서 목표를 설정해 보세요.', 'success');
+    }
+  });
+
+  // Load Sample (Virtual) Data
+  document.getElementById('load-sample-data-btn').addEventListener('click', () => {
+    if (confirm('샘플(가상) 데이터를 불러오시겠습니까? 체험용 일지와 프로필이 생성됩니다.')) {
+      state = getSampleState();
+      saveState();
+      backupModal.classList.remove('active');
+      showToast('샘플 데이터가 로드되었습니다! ✨', 'info');
+    }
+  });
+
   // Reset All Data
   document.getElementById('reset-all-data-btn').addEventListener('click', () => {
     if (confirm('정말로 모든 피드백 기록 및 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
       localStorage.removeItem(STORAGE_KEY);
-      state = defaultState;
+      state = createDefaultState();
       saveState();
       backupModal.classList.remove('active');
       showToast('모든 데이터가 초기화되었습니다.', 'info');
@@ -801,9 +1003,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 11. CONFETTI EFFECT FOR CELEBRATION
   // ------------------------------------------------------------------------
   function triggerConfetti() {
-    const count = 200;
-    const defaults = { origin: { y: 0.7 } };
-
     for (let i = 0; i < 50; i++) {
       const p = document.createElement('div');
       p.style.position = 'fixed';
@@ -832,6 +1031,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
   // 12. UI SYNCHRONIZATION & TOAST ENGINE
   // ------------------------------------------------------------------------
+  function calculateRealStreak() {
+    if (!state.daily_logs || state.daily_logs.length === 0) return 0;
+    const datesSet = new Set(state.daily_logs.map(l => l.date));
+    let streak = 0;
+    let checkDate = new Date();
+    let checkStr = getLocalDateString(checkDate);
+
+    // If today is not logged yet, check starting from yesterday
+    if (!datesSet.has(checkStr)) {
+      checkDate.setDate(checkDate.getDate() - 1);
+      checkStr = getLocalDateString(checkDate);
+      if (!datesSet.has(checkStr)) {
+        return 0;
+      }
+    }
+
+    while (datesSet.has(checkStr)) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+      checkStr = getLocalDateString(checkDate);
+    }
+    return streak;
+  }
+
   function updateUI() {
     // 1. Profile & Postcard
     document.getElementById('display-user-id').textContent = state.user_profile.user_id;
@@ -845,14 +1068,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Stats & Progress
     const completedCount = state.daily_logs.length;
     const progressPercent = Math.round((completedCount / 21) * 100);
+    const realStreak = calculateRealStreak();
 
-    document.getElementById('header-streak').querySelector('#streak-count').textContent = completedCount;
+    document.getElementById('header-streak').querySelector('#streak-count').textContent = realStreak;
     document.getElementById('current-day-label').textContent = `Day ${Math.min(21, completedCount + 1)} / 21`;
     document.getElementById('progress-percent-text').textContent = `${progressPercent}% (${completedCount} / 21일 완료)`;
     document.getElementById('challenge-progress-fill').style.width = `${progressPercent}%`;
 
     document.getElementById('stat-completed-days').textContent = `${completedCount} / 21일`;
-    document.getElementById('stat-streak-count').textContent = `${completedCount}일`;
+    document.getElementById('stat-streak-count').textContent = `${realStreak}일`;
     document.getElementById('stat-completion-rate').textContent = `${progressPercent}%`;
 
     const totalWords = state.daily_logs.reduce((acc, log) => {
@@ -862,11 +1086,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stat-total-words').textContent = `${totalWords.toLocaleString()}자`;
 
     const lockBadge = document.getElementById('reflection-lock-badge');
-    if (completedCount >= 21) {
-      lockBadge.textContent = '🎉 (완성)';
-      lockBadge.style.color = '#34d399';
-    } else {
-      lockBadge.textContent = `(${completedCount}/21일)`;
+    if (lockBadge) {
+      if (completedCount >= 21) {
+        lockBadge.textContent = '🎉 (완성)';
+        lockBadge.style.color = '#34d399';
+      } else {
+        lockBadge.textContent = `(${completedCount}/21일)`;
+        lockBadge.style.color = 'var(--text-muted)';
+      }
     }
 
     // 3. Render Dashboard Grid & Entry Log

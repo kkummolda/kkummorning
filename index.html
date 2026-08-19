@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>꿈모닝 5분 피드백 | Chronos Zero</title>
+  <title>꿈모닝</title>
   <meta name="description" content="매일 밤 자기 전 5분, 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 웹 애플리케이션입니다.">
   <meta name="theme-color" content="#0b0e17">
   <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
@@ -24,7 +24,7 @@
       <div class="header-brand">
         <div class="logo-icon">🌙</div>
         <div class="brand-text">
-          <h1>꿈모닝 <span class="highlight-text">5분 피드백</span></h1>
+          <h1>꿈모닝</h1>
         </div>
       </div>
 
@@ -165,39 +165,51 @@
 
             <!-- 4 Goals Vector Grid (Chronos Style Vector Cards) -->
             <div class="goals-overview-grid">
-              <div class="vector-card card-self">
+              <div class="vector-card card-self interactive" data-edit-target="self" title="클릭하여 자아 다짐 수정">
                 <div class="vector-card-header">
                   <span>자아 (Self)</span>
-                  <span class="chronos-badge badge-mint">ACTIVE</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-mint">ACTIVE</span>
+                    <button class="card-edit-btn" data-edit-target="self"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
                 </div>
-                <h4 class="vector-card-title">🌱 나다움 성찰</h4>
+                <h4 class="vector-card-title" id="display-title-self">🌱 나다움 성찰</h4>
                 <p id="display-goal-self" style="font-size: 0.88rem; color: var(--text-muted);">매일 30분 독서 및 온전한 생각 정리</p>
               </div>
               
-              <div class="vector-card card-family">
+              <div class="vector-card card-family interactive" data-edit-target="family" title="클릭하여 가정 다짐 수정">
                 <div class="vector-card-header">
                   <span>가정 (Family)</span>
-                  <span class="chronos-badge badge-coral">PRIMARY</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-coral">PRIMARY</span>
+                    <button class="card-edit-btn" data-edit-target="family"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
                 </div>
-                <h4 class="vector-card-title">🏡 경청과 따뜻함</h4>
+                <h4 class="vector-card-title" id="display-title-family">🏡 경청과 따뜻함</h4>
                 <p id="display-goal-family" style="font-size: 0.88rem; color: var(--text-muted);">가족과 따뜻한 저녁 식사와 깊은 경청</p>
               </div>
 
-              <div class="vector-card card-society">
+              <div class="vector-card card-society interactive" data-edit-target="society" title="클릭하여 사회 다짐 수정">
                 <div class="vector-card-header">
                   <span>사회 (Society)</span>
-                  <span class="chronos-badge badge-blue">FOCUS</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-blue">FOCUS</span>
+                    <button class="card-edit-btn" data-edit-target="society"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
                 </div>
-                <h4 class="vector-card-title">🏢 사회적 기여</h4>
+                <h4 class="vector-card-title" id="display-title-society">🏢 사회적 기여</h4>
                 <p id="display-goal-society" style="font-size: 0.88rem; color: var(--text-muted);">동료의 이야기를 먼저 끝까지 경청하기</p>
               </div>
 
-              <div class="vector-card card-soul">
+              <div class="vector-card card-soul interactive" data-edit-target="soul" title="클릭하여 영혼 다짐 수정">
                 <div class="vector-card-header">
                   <span>영혼 (Soul)</span>
-                  <span class="chronos-badge badge-mint">BALANCED</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-mint">BALANCED</span>
+                    <button class="card-edit-btn" data-edit-target="soul"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
                 </div>
-                <h4 class="vector-card-title">✨ 내면의 평온</h4>
+                <h4 class="vector-card-title" id="display-title-soul">✨ 내면의 평온</h4>
                 <p id="display-goal-soul" style="font-size: 0.88rem; color: var(--text-muted);">하루 5분 호흡과 명상으로 평온 지키기</p>
               </div>
             </div>
@@ -327,7 +339,10 @@
           <div id="autosave-indicator" style="font-size: 0.8rem; color: var(--text-dim);">
             <i class="fa-solid fa-cloud-arrow-up"></i> 자동 임시 저장됨
           </div>
-          <div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" id="delete-daily-btn" style="color: var(--accent-coral); border-color: rgba(248, 113, 113, 0.3); display: none;">
+              <i class="fa-solid fa-trash-can"></i> 삭제
+            </button>
             <button class="btn btn-outline" data-goto="2">이전 2단계</button>
             <button class="btn btn-engage" id="save-daily-btn-bottom">+ Save Feedback</button>
           </div>
@@ -345,7 +360,7 @@
               <p class="chronos-banner-desc">21일간의 성찰 잔디와 연승 현황을 추적합니다.</p>
             </div>
             <button class="btn btn-engage" id="view-comprehensive-reflection-btn">
-              <i class="fa-solid fa-trophy"></i> 21일 종합 회고서
+              <i class="fa-solid fa-trophy"></i> 21일 종합 회고서 <span id="reflection-lock-badge" style="font-size: 0.8rem; margin-left: 6px;">(0/21일)</span>
             </button>
           </div>
         </div>
@@ -505,16 +520,44 @@
         <button class="modal-close-btn" id="close-backup-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
-        <p style="margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted);">작성한 데이터를 JSON 파일로 백업하거나 불러올 수 있습니다.</p>
-        <button class="btn btn-outline" id="export-json-btn" style="width: 100%; margin-bottom: 12px;"><i class="fa-solid fa-download"></i> JSON 백업 다운로드</button>
+        <p style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted);">실제 챌린지를 새로 시작하거나, 샘플 데이터를 불러와 미리 체험할 수 있습니다.</p>
+        <button class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; margin-bottom: 10px; color: var(--accent-mint); border-color: rgba(52, 211, 153, 0.3);">
+          <i class="fa-solid fa-flag-checkered"></i> 새 21일 챌린지 시작 (초기화)
+        </button>
+        <button class="btn btn-outline" id="load-sample-data-btn" style="width: 100%; margin-bottom: 16px; color: var(--accent-blue); border-color: rgba(129, 140, 248, 0.3);">
+          <i class="fa-solid fa-database"></i> 샘플(가상) 데이터 불러오기
+        </button>
+        <hr style="border: none; border-top: 1px solid var(--border-subtle); margin-bottom: 16px;">
+        <p style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted);">작성한 데이터를 JSON 파일로 백업하거나 불러올 수 있습니다.</p>
+        <button class="btn btn-outline" id="export-json-btn" style="width: 100%; margin-bottom: 10px;"><i class="fa-solid fa-download"></i> JSON 백업 다운로드</button>
         <input type="file" id="import-json-file" accept=".json" style="display: none;">
-        <button class="btn btn-outline" id="import-json-btn" style="width: 100%; margin-bottom: 12px;"><i class="fa-solid fa-upload"></i> JSON 파일 복원</button>
-        <button class="btn btn-outline" id="reset-all-data-btn" style="width: 100%; color: var(--accent-coral); border-color: rgba(248, 113, 113, 0.3);">전체 데이터 초기화</button>
+        <button class="btn btn-outline" id="import-json-btn" style="width: 100%; margin-bottom: 10px;"><i class="fa-solid fa-upload"></i> JSON 파일 복원</button>
+        <button class="btn btn-outline" id="reset-all-data-btn" style="width: 100%; color: var(--accent-coral); border-color: rgba(248, 113, 113, 0.3);"><i class="fa-solid fa-arrow-rotate-left"></i> 전체 데이터 초기화</button>
       </div>
     </div>
   </div>
 
   <div id="toast-container"></div>
+
+  <!-- FIXED BOTTOM APP NAVIGATION BAR (Native App Experience) -->
+  <nav class="bottom-app-nav">
+    <button class="bottom-nav-btn active" data-step="1" id="bottom-step-1">
+      <i class="fa-solid fa-spa"></i>
+      <span>마음보기</span>
+    </button>
+    <button class="bottom-nav-btn" data-step="2" id="bottom-step-2">
+      <i class="fa-solid fa-lightbulb"></i>
+      <span>가치생각</span>
+    </button>
+    <button class="bottom-nav-btn" data-step="3" id="bottom-step-3">
+      <i class="fa-solid fa-pen-to-square"></i>
+      <span>일일피드백</span>
+    </button>
+    <button class="bottom-nav-btn" data-step="4" id="bottom-step-4">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>21일 회고</span>
+    </button>
+  </nav>
 
   <script src="app.js"></script>
 </body>
