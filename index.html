@@ -39,6 +39,9 @@
 
       <!-- Right Action Icons -->
       <div class="header-status">
+        <div class="user-profile-pill" id="header-user-profile" title="클릭하여 작성자 프로필 변경" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
+          <i class="fa-solid fa-circle-user"></i> <span id="header-user-name">Dreamer</span>
+        </div>
         <div class="streak-badge" id="header-streak">
           <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>일 연속
         </div>
@@ -564,6 +567,35 @@
         <input type="file" id="import-json-file" accept=".json" style="display: none;">
         <button class="btn btn-outline" id="import-json-btn" style="width: 100%; margin-bottom: 10px;"><i class="fa-solid fa-upload"></i> JSON 파일 복원</button>
         <button class="btn btn-outline" id="reset-all-data-btn" style="width: 100%; color: var(--accent-coral); border-color: rgba(248, 113, 113, 0.3);"><i class="fa-solid fa-arrow-rotate-left"></i> 전체 데이터 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIRST-TIME USER WELCOME & IDENTIFICATION MODAL -->
+  <div class="modal-overlay" id="user-welcome-modal">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3>🌙 꿈모닝 피드백 시작하기</h3>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
+          반갑습니다! 21일간의 나다운 삶을 기록하기 위해 <strong>작성자 프로필</strong>을 입력해 주세요. (관리자 식별 및 클라우드 동기화에 사용됩니다.)
+        </p>
+        
+        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-main); display: block; margin-bottom: 6px;">작성자 성함 / 닉네임 <span style="color: var(--accent-coral);">*</span></label>
+            <input type="text" id="welcome-user-name-input" class="chronos-input" placeholder="예: 홍길동" style="width: 100%;">
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; color: var(--text-main); display: block; margin-bottom: 6px;">식별 이메일 또는 연락처 <span style="color: var(--accent-coral);">*</span></label>
+            <input type="text" id="welcome-user-email-input" class="chronos-input" placeholder="예: hong@naver.com 또는 010-1234-5678" style="width: 100%;">
+          </div>
+        </div>
+        
+        <button class="btn btn-engage" id="save-user-welcome-btn" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;">
+          🚀 21일 챌린지 시작하기
+        </button>
       </div>
     </div>
   </div>

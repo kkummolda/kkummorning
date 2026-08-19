@@ -20,7 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function createDefaultState() {
     return {
       user_profile: {
-        user_id: '드림러',
+        user_id: '',
+        user_name: '',
+        user_email: '',
         one_word: '경청',
         one_word_quote: '타인의 소리와 내 영혼의 소리에 귀 기울이는 삶',
         challenge_start_date: getLocalDateString(),
@@ -1067,9 +1069,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isManual) showToast('Supabase 클라우드 동기화 중...', 'info');
 
       // 1. Upsert User Profile
+      const userId = state.user_profile.user_email || state.user_profile.user_id || 'guest@dream.com';
+      const userName = state.user_profile.user_name || 'Dreamer';
+
       const profileData = {
-        user_id: state.user_profile.user_id || 'Dreamer',
-        user_name: state.user_profile.user_id || 'Dreamer',
+        user_id: userId,
+        user_name: userName,
+        email: state.user_profile.user_email || userId,
         oneword: state.user_profile.one_word || '경청',
         oneword_quote: state.user_profile.one_word_quote || '',
         goal_self: state.user_profile.four_area_goals.self || '',
@@ -1090,7 +1096,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // 2. Upsert Daily Logs
       if (state.daily_logs && state.daily_logs.length > 0) {
         const logsArray = state.daily_logs.map(log => ({
-          user_id: state.user_profile.user_id || 'Dreamer',
+          user_id: userId,
+          user_name: userName,
           date: log.date,
           day: log.day,
           self_feedback: log.self_feedback || '',
@@ -1208,7 +1215,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateUI() {
     // 1. Profile & Postcard
-    document.getElementById('display-user-id').textContent = state.user_profile.user_id;
+    const displayName = state.user_profile.user_name || state.user_profile.user_id || 'Dreamer';
+    document.getElementById('display-user-id').textContent = displayName;
+    const headerUserName = document.getElementById('header-user-name');
+    if (headerUserName) {
+      headerUserName.textContent = displayName;
+    }
     document.getElementById('display-oneword').textContent = `" ${state.user_profile.one_word} "`;
     document.getElementById('display-oneword-quote').textContent = state.user_profile.one_word_quote;
     document.getElementById('display-goal-self').textContent = state.user_profile.four_area_goals.self;
@@ -1255,6 +1267,52 @@ document.addEventListener('DOMContentLoaded', () => {
     populateFeedbackForm(feedbackDateInput.value);
   }
 
+  // ------------------------------------------------------------------------
+  // FIRST-TIME USER WELCOME & IDENTIFICATION MODAL ENGINE
+  // ------------------------------------------------------------------------
+  function checkFirstTimeUser() {
+    if (!state.user_profile.user_name || !state.user_profile.user_email) {
+      const welcomeModal = document.getElementById('user-welcome-modal');
+      if (welcomeModal) welcomeModal.classList.add('active');
+    }
+  }
+
+  const saveWelcomeBtn = document.getElementById('save-user-welcome-btn');
+  if (saveWelcomeBtn) {
+    saveWelcomeBtn.addEventListener('click', () => {
+      const name = document.getElementById('welcome-user-name-input').value.trim();
+      const email = document.getElementById('welcome-user-email-input').value.trim();
+
+      if (!name || !email) {
+        showToast('성함(닉네임)과 식별 이메일/연락처를 모두 입력해 주세요.', 'error');
+        return;
+      }
+
+      state.user_profile.user_name = name;
+      state.user_profile.user_email = email;
+      state.user_profile.user_id = email;
+      saveState();
+      syncToSupabase();
+      updateUI();
+
+      const welcomeModal = document.getElementById('user-welcome-modal');
+      if (welcomeModal) welcomeModal.classList.remove('active');
+      showToast(`${name} 님의 작성자 프로필이 등록되었습니다! ✨`, 'success');
+    });
+  }
+
+  const headerProfilePill = document.getElementById('header-user-profile');
+  if (headerProfilePill) {
+    headerProfilePill.addEventListener('click', () => {
+      const nameInput = document.getElementById('welcome-user-name-input');
+      const emailInput = document.getElementById('welcome-user-email-input');
+      if (nameInput) nameInput.value = state.user_profile.user_name || '';
+      if (emailInput) emailInput.value = state.user_profile.user_email || '';
+      const welcomeModal = document.getElementById('user-welcome-modal');
+      if (welcomeModal) welcomeModal.classList.add('active');
+    });
+  }
+
   function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -1285,7 +1343,8 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   }
 
-  // Initialize UI
+  // Initialize UI & Check Welcome Modal
   updateTimerDisplay();
   updateUI();
+  checkFirstTimeUser();
 });

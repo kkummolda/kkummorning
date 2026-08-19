@@ -1,13 +1,13 @@
 -- ====================================================================
 -- 🌙 꿈모닝 5분 피드백 (Dream Morning) - Supabase Database Schema
--- Supabase 대시보드 -> SQL Editor에서 아래 쿼리를 전체 복사하여 Run 하세요.
 -- ====================================================================
 
--- 1. 사용자 프로필 테이블 (One Word & 4영역 다짐)
+-- 1. 사용자 프로필 테이블 (One Word & 4영역 다짐 & 작성자 정보)
 CREATE TABLE IF NOT EXISTS public.user_profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id TEXT NOT NULL UNIQUE DEFAULT 'Dreamer',
+    user_id TEXT NOT NULL UNIQUE DEFAULT 'guest@dream.com',
     user_name TEXT DEFAULT 'Dreamer',
+    email TEXT DEFAULT 'guest@dream.com',
     oneword TEXT DEFAULT '경청',
     oneword_quote TEXT DEFAULT '타인의 소리와 내 영혼의 소리에 귀 기울이는 삶',
     goal_self TEXT DEFAULT '매일 30분 독서 및 온전한 생각 정리',
@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
 -- 2. 21일 피드백 일지 테이블 (Daily Logs)
 CREATE TABLE IF NOT EXISTS public.daily_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id TEXT NOT NULL DEFAULT 'Dreamer',
+    user_id TEXT NOT NULL DEFAULT 'guest@dream.com',
+    user_name TEXT DEFAULT 'Dreamer',
     day INT NOT NULL,
     date DATE NOT NULL,
     self_feedback TEXT DEFAULT '',
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.daily_logs (
     CONSTRAINT unique_user_date UNIQUE (user_id, date)
 );
 
--- RLS (Row Level Security) 비활성화 또는 누구나 접근 가능하도록 허용 (Anon Key 클라이언트 접근용)
+-- RLS (Row Level Security) 정책
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.daily_logs ENABLE ROW LEVEL SECURITY;
 
