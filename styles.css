@@ -804,7 +804,8 @@ body {
   color: #fff;
 }
 
-.grass-grid {
+.grass-grid,
+.grass-grid-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 12px;
@@ -1065,33 +1066,57 @@ body {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 14px;
+    padding: 10px 12px;
     margin: 0 -12px 16px -12px;
+    flex-wrap: nowrap;
+  }
+  .header-brand {
+    gap: 6px;
+    flex-shrink: 0;
   }
   .brand-text h1 {
-    font-size: 1.15rem;
+    font-size: 1.02rem;
+    white-space: nowrap;
   }
   .logo-icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   .header-status {
-    gap: 5px;
+    gap: 4px;
+    flex-shrink: 0;
   }
   .user-profile-pill {
-    padding: 3px 8px !important;
-    font-size: 11px !important;
+    padding: 3px 7px !important;
+    font-size: 10px !important;
   }
-  .streak-badge, .dday-pill {
-    padding: 3px 8px;
-    font-size: 11px;
+  .user-profile-pill span {
+    max-width: 44px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dday-pill {
+    padding: 3px 7px;
+    font-size: 10px;
   }
   .icon-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.85rem;
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
   }
   .stepper-nav-header {
     display: none; /* Hide top stepper bar on mobile, use bottom nav */
+  }
+
+  /* Trim header to essentials on mobile: secondary items live in footer / step-4 stats instead */
+  .header-status .streak-badge,
+  .header-status a[href="playboard/index.html"] {
+    display: none;
+  }
+  #open-auth-modal-btn {
+    padding: 4px 9px !important;
+    font-size: 10px !important;
+    white-space: nowrap;
   }
 
   /* Sound Presets 2x2 Grid for Mobile */
@@ -1154,7 +1179,8 @@ body {
   }
 
   /* 21-Day Habit Grass 7-Column Smartphone Grid (7x3 layout) */
-  .grass-grid {
+  .grass-grid,
+  .grass-grid-container {
     grid-template-columns: repeat(7, 1fr);
     gap: 6px;
   }
@@ -1176,6 +1202,63 @@ body {
   }
   .bottom-nav-btn i {
     font-size: 1.15rem;
+  }
+
+  /* Banner Cards: reduce padding & title size for narrow screens */
+  .chronos-banner-card {
+    padding: 20px 16px;
+  }
+  .chronos-banner-title {
+    font-size: 1.5rem;
+  }
+  .chronos-banner-desc {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  /* STEP 1: Timer + Sound panel — stack vertically (fixes 280px column overflow) */
+  .timer-ambient-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .timer-container {
+    width: 180px;
+    height: 180px;
+  }
+  .sound-controls-card {
+    padding: 18px;
+  }
+  .timer-btn-group {
+    flex-direction: column;
+  }
+  .timer-btn-group .btn {
+    width: 100%;
+  }
+
+  /* Step prev/next footer actions — stack full-width so long labels don't wrap letter-by-letter */
+  .step-footer-actions {
+    flex-direction: column !important;
+    gap: 10px;
+  }
+  .step-footer-actions .btn {
+    width: 100%;
+  }
+
+  /* STEP 2: One-word postcard + goals — stack vertically (fixes 340px column overflow) */
+  .postcard-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .goals-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* STEP 3: Daily feedback area cards — single column on mobile */
+  .feedback-cards-grid,
+  .feedback-quad-grid {
+    grid-template-columns: 1fr !important;
+    display: grid;
+    gap: 14px;
   }
 
   /* Modals Smartphone Layout */
