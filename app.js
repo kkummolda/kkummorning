@@ -1639,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveStateToLocalStorage();
     } catch (err) {
       console.error('Save daily log to Supabase error:', err);
-      showToast('일기 저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+      showToast('플래너 저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
     }
   }
 
