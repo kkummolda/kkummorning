@@ -1005,11 +1005,43 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirm('정말로 모든 피드백 기록 및 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
       localStorage.removeItem(STORAGE_KEY);
       state = createDefaultState();
-      saveState();
+      saveStateToLocalStorage();
       backupModal.classList.remove('active');
       showToast('모든 데이터가 초기화되었습니다.', 'info');
     }
   });
+
+  // Handle First-Time User Welcome Modal
+  const welcomeModal = document.getElementById('user-welcome-modal');
+  const saveWelcomeBtn = document.getElementById('save-user-welcome-btn');
+
+  if (saveWelcomeBtn) {
+    saveWelcomeBtn.addEventListener('click', () => {
+      const name = document.getElementById('welcome-user-name-input').value.trim();
+      const email = document.getElementById('welcome-user-email-input').value.trim();
+
+      if (!name) {
+        showToast('성함 또는 닉네임을 입력해 주세요.', 'error');
+        return;
+      }
+
+      state.user_profile.user_name = name;
+      if (email) state.user_profile.user_email = email;
+      saveStateToLocalStorage();
+      updateUI();
+
+      if (welcomeModal) welcomeModal.classList.remove('active');
+      showToast(`${name} 님 반갑습니다! 21일 회고 피드백을 시작합니다. 🚀`, 'success');
+
+      // Pre-fill Auth Modal if email was provided
+      if (email) {
+        const authEmailInput = document.getElementById('auth-email-input');
+        const authNameInput = document.getElementById('auth-name-input');
+        if (authEmailInput) authEmailInput.value = email;
+        if (authNameInput) authNameInput.value = name;
+      }
+    });
+  }
 
   // ------------------------------------------------------------------------
   // 11. SUPABASE AUTHENTICATION & POSTGRES REAL DATABASE ENGINE
