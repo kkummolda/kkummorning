@@ -1050,21 +1050,150 @@ body {
   transform: scale(0.92);
 }
 
-@media (max-width: 850px) {
+/* SMARTPHONE MOBILE NATIVE OPTIMIZATION (iOS / Android Native App Experience) */
+@media (max-width: 600px) {
+  body {
+    font-size: 15px;
+  }
+  
+  .app-container {
+    padding: 0 12px 110px 12px;
+  }
+
+  /* Compact Native App Header */
   .app-header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 18px;
-    margin: 0 -16px 20px -16px;
+    padding: 12px 14px;
+    margin: 0 -12px 16px -12px;
+  }
+  .brand-text h1 {
+    font-size: 1.15rem;
+  }
+  .logo-icon {
+    font-size: 1.2rem;
+  }
+  .header-status {
+    gap: 5px;
+  }
+  .user-profile-pill {
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+  }
+  .streak-badge, .dday-pill {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
   }
   .stepper-nav-header {
-    display: none; /* Mobile uses Bottom Nav Bar */
+    display: none; /* Hide top stepper bar on mobile, use bottom nav */
   }
-  .timer-ambient-grid, .postcard-container, .feedback-cards-grid, .dashboard-stats-grid {
-    grid-template-columns: 1fr;
+
+  /* Sound Presets 2x2 Grid for Mobile */
+  .sound-preset-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
+  .sound-chip {
+    padding: 10px 8px;
+  }
+  .chip-icon {
+    font-size: 1.2rem;
+  }
+  .chip-title {
+    font-size: 11px;
+  }
+
+  /* Timer & Ambient Display */
+  .timer-svg {
+    width: 170px;
+    height: 170px;
+  }
+  .timer-time {
+    font-size: 2.1rem;
+  }
+
+  /* One Word Postcard Mobile Scaling */
+  .oneword-postcard {
+    padding: 20px 16px;
+  }
+  .oneword-title {
+    font-size: 1.8rem;
+  }
+
+  /* Step 3 Form & Input Optimization (Prevents iOS Safari auto-zoom) */
+  input[type="text"], input[type="date"], input[type="password"], textarea {
+    font-size: 16px !important; /* Minimum 16px prevents iOS Safari viewport zoom */
+  }
+  .chronos-input-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .quick-chips {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Dashboard Stats 2x2 Smartphone Grid */
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
+  /* 21-Day Habit Grass 7-Column Smartphone Grid (7x3 layout) */
   .grass-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+  .grass-tile {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    font-size: 10px;
+  }
+
+  /* Fixed Bottom Nav Bar Smartphone Fit */
+  .bottom-app-nav {
+    max-width: 100%;
+    border-radius: 0;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .bottom-nav-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .bottom-nav-btn i {
+    font-size: 1.15rem;
+  }
+
+  /* Modals Smartphone Layout */
+  .modal-overlay {
+    padding: 12px;
+  }
+  .modal-card {
+    padding: 18px 16px;
+    border-radius: 20px;
+    max-height: 90vh;
+  }
+  #toast-container {
+    bottom: 75px;
+    right: 12px;
+    left: 12px;
+  }
+  .toast {
+    font-size: 13px;
+    padding: 10px 14px;
   }
 }
