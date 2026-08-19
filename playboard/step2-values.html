@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>꿈모닝 - 2단계: 가치 생각 (Values & One-Word)</title>
+  <meta name="description" content="나다운 핵심 키워드(One Word)와 자아·가정·사회·영혼 4대 영역 다짐 카드를 설정하는 가치 생각 독립 프로토타입 페이지입니다.">
+  <meta name="theme-color" content="#0b0e17">
+  <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome & Supabase SDK -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- PLAYBOARD NAVIGATION HEADER -->
+    <header class="app-header">
+      <div class="header-brand">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <div class="logo-icon">🌙</div>
+          <div class="brand-text">
+            <h1>꿈모닝 <span style="font-size: 0.7rem; color: var(--accent-mint); font-weight: 500;">(Page Prototype 2)</span></h1>
+          </div>
+        </a>
+      </div>
+
+      <nav class="stepper-nav-header">
+        <a href="index.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard</a>
+        <a href="step1-mindfulness.html" class="nav-link-btn" style="text-decoration: none;">1단계: 마음 보기</a>
+        <a href="step2-values.html" class="nav-link-btn active" style="text-decoration: none;">2단계: 가치 생각</a>
+        <a href="step3-feedback.html" class="nav-link-btn" style="text-decoration: none;">3단계: 일일 피드백</a>
+        <a href="step4-dashboard.html" class="nav-link-btn" style="text-decoration: none;">4단계: 21일 잔디</a>
+        <a href="pages-list.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-list"></i> 목록</a>
+      </nav>
+
+      <div class="header-status">
+        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
+          <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 가입
+        </button>
+        <div class="user-profile-pill" id="header-user-profile" style="display: none; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
+          <i class="fa-solid fa-circle-user"></i> <span id="header-user-name">Dreamer</span>
+          <i class="fa-solid fa-right-from-bracket" id="header-logout-icon" title="로그아웃" style="margin-left: 4px; opacity: 0.7;"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content" style="margin-top: 20px;">
+      <!-- STEP 2: 가치 생각 -->
+      <section class="step-view active" id="view-step-2">
+        <div class="chronos-banner-card">
+          <div class="step-badge">2단계: 가치 생각 (One Word Postcard)</div>
+          <h2 class="chronos-banner-title">나를 지탱하는 핵심 단어와 4가지 영역의 다짐</h2>
+          <p class="chronos-banner-desc">나답게 살아가는 핵심 키워드(One Word)와 4영역 다짐 카드입니다.</p>
+
+          <div class="postcard-container">
+            <!-- One-Word Card -->
+            <div class="oneword-postcard" id="oneword-card-element">
+              <div class="postcard-header">
+                <span class="postcard-tag">21-DAY CHALLENGE POSTCARD</span>
+                <span class="chronos-badge badge-blue">ENGAGED</span>
+              </div>
+              <div class="postcard-body">
+                <div class="oneword-label">나를 이끄는 방향 단어</div>
+                <h3 class="oneword-title" id="display-oneword">" 경청 "</h3>
+                <p class="oneword-quote" id="display-oneword-quote">타인의 소리와 내 영혼의 소리에 귀 기울이는 삶</p>
+              </div>
+              <div class="postcard-footer">
+                <span>작성자: <strong id="display-user-id">Dreamer</strong></span>
+                <button class="btn-text-edit" id="open-edit-goals-btn">
+                  <i class="fa-solid fa-pen"></i> 수정
+                </button>
+              </div>
+            </div>
+
+            <!-- 4 Goals Vector Grid -->
+            <div class="goals-overview-grid">
+              <div class="vector-card card-self interactive" data-edit-target="self" title="클릭하여 자아 다짐 수정">
+                <div class="vector-card-header">
+                  <span>자아 (Self)</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-mint">ACTIVE</span>
+                    <button class="card-edit-btn" data-edit-target="self"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
+                </div>
+                <h4 class="vector-card-title" id="display-title-self">🌱 나다움 성찰</h4>
+                <p id="display-goal-self" style="font-size: 0.88rem; color: var(--text-muted);">매일 30분 독서 및 온전한 생각 정리</p>
+              </div>
+              
+              <div class="vector-card card-family interactive" data-edit-target="family" title="클릭하여 가정 다짐 수정">
+                <div class="vector-card-header">
+                  <span>가정 (Family)</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-coral">PRIMARY</span>
+                    <button class="card-edit-btn" data-edit-target="family"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
+                </div>
+                <h4 class="vector-card-title" id="display-title-family">🏡 경청과 따뜻함</h4>
+                <p id="display-goal-family" style="font-size: 0.88rem; color: var(--text-muted);">가족과 따뜻한 저녁 식사와 깊은 경청</p>
+              </div>
+
+              <div class="vector-card card-society interactive" data-edit-target="society" title="클릭하여 사회 다짐 수정">
+                <div class="vector-card-header">
+                  <span>사회 (Society)</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-blue">FOCUS</span>
+                    <button class="card-edit-btn" data-edit-target="society"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
+                </div>
+                <h4 class="vector-card-title" id="display-title-society">🏢 사회적 기여</h4>
+                <p id="display-goal-society" style="font-size: 0.88rem; color: var(--text-muted);">동료의 이야기를 먼저 끝까지 경청하기</p>
+              </div>
+
+              <div class="vector-card card-soul interactive" data-edit-target="soul" title="클릭하여 영혼 다짐 수정">
+                <div class="vector-card-header">
+                  <span>영혼 (Soul)</span>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="chronos-badge badge-mint">INNER</span>
+                    <button class="card-edit-btn" data-edit-target="soul"><i class="fa-solid fa-pen"></i> 수정</button>
+                  </div>
+                </div>
+                <h4 class="vector-card-title" id="display-title-soul">✨ 영혼의 평온</h4>
+                <p id="display-goal-soul" style="font-size: 0.88rem; color: var(--text-muted);">하루 5분 호흡과 명상으로 평온 지키기</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-footer-actions" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <a href="step1-mindfulness.html" class="btn btn-outline" style="text-decoration: none;">
+              <i class="fa-solid fa-chevron-left"></i> 이전: 1단계 마음 보기
+            </a>
+            <a href="step3-feedback.html" class="btn btn-engage" style="text-decoration: none;">
+              다음: 3단계 일일 피드백 작성 <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- EDIT GOALS MODAL -->
+  <div class="modal-overlay" id="edit-goals-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>원워드 & 4대 영역 다짐 수정</h3>
+        <button class="modal-close-btn" id="close-edit-goals-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-goals-form" onsubmit="return false;">
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">나의 원워드 (One Word)</label>
+            <input type="text" id="input-oneword" class="chronos-input" placeholder="예: 경청, 몰입, 사랑" style="width: 100%;">
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">원워드 다짐 문장</label>
+            <input type="text" id="input-oneword-quote" class="chronos-input" placeholder="예: 타인의 소리와 내 영혼의 소리에 귀 기울이는 삶" style="width: 100%;">
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+              <label style="font-size: 0.8rem; color: var(--accent-mint); display: block; margin-bottom: 4px;">🌱 자아 (Self) 다짐</label>
+              <input type="text" id="input-goal-self" class="chronos-input" style="width: 100%;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; color: var(--accent-coral); display: block; margin-bottom: 4px;">🏡 가정 (Family) 다짐</label>
+              <input type="text" id="input-goal-family" class="chronos-input" style="width: 100%;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; color: var(--accent-blue); display: block; margin-bottom: 4px;">🏢 사회 (Society) 다짐</label>
+              <input type="text" id="input-goal-society" class="chronos-input" style="width: 100%;">
+            </div>
+            <div>
+              <label style="font-size: 0.8rem; color: var(--accent-purple); display: block; margin-bottom: 4px;">✨ 영혼 (Soul) 다짐</label>
+              <input type="text" id="input-goal-soul" class="chronos-input" style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; text-align: right;">
+            <button type="button" class="btn btn-engage" id="save-goals-btn">
+              <i class="fa-solid fa-floppy-disk"></i> 원워드 & 다짐 저장하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>꿈모닝 - 회원가입 & Supabase 클라우드 연동 (Auth & Sync)</title>
+  <meta name="description" content="Supabase 계정 가입 및 로그인, Anon Key 연동 및 프로필 관리를 전담하는 독립 인증 프로토타입 페이지입니다.">
+  <meta name="theme-color" content="#0b0e17">
+  <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome & Supabase SDK -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- PLAYBOARD NAVIGATION HEADER -->
+    <header class="app-header">
+      <div class="header-brand">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <div class="logo-icon">🌙</div>
+          <div class="brand-text">
+            <h1>꿈모닝 <span style="font-size: 0.7rem; color: var(--accent-blue); font-weight: 500;">(Auth Prototype)</span></h1>
+          </div>
+        </a>
+      </div>
+
+      <nav class="stepper-nav-header">
+        <a href="index.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard</a>
+        <a href="step1-mindfulness.html" class="nav-link-btn" style="text-decoration: none;">1단계: 마음 보기</a>
+        <a href="step2-values.html" class="nav-link-btn" style="text-decoration: none;">2단계: 가치 생각</a>
+        <a href="step3-feedback.html" class="nav-link-btn" style="text-decoration: none;">3단계: 일일 피드백</a>
+        <a href="step4-dashboard.html" class="nav-link-btn" style="text-decoration: none;">4단계: 21일 잔디</a>
+        <a href="auth.html" class="nav-link-btn active" style="text-decoration: none;"><i class="fa-solid fa-user-shield"></i> 인증/설정</a>
+        <a href="pages-list.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-list"></i> 목록</a>
+      </nav>
+
+      <div class="header-status">
+        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
+          <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 가입
+        </button>
+        <div class="user-profile-pill" id="header-user-profile" style="display: none; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
+          <i class="fa-solid fa-circle-user"></i> <span id="header-user-name">Dreamer</span>
+          <i class="fa-solid fa-right-from-bracket" id="header-logout-icon" title="로그아웃" style="margin-left: 4px; opacity: 0.7;"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content" style="margin-top: 20px;">
+      <div class="chronos-banner-card">
+        <div class="step-badge">인증 & 클라우드 연동 (Auth & Cloud Infrastructure)</div>
+        <h2 class="chronos-banner-title">Supabase 클라우드 계정 관리 및 데이터 연동 설정</h2>
+        <p class="chronos-banner-desc">클라우드 데이터베이스 연동 상태를 확인하고, 계정 로그인 및 Anon Key를 설정합니다.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 20px;">
+          <!-- Auth Form Card -->
+          <div class="feedback-field-card" style="padding: 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+            <h3 style="margin-bottom: 14px; font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-user-plus" style="color: var(--accent-blue);"></i> 계정 가입 및 로그인
+            </h3>
+
+            <!-- Auth Tabs -->
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: var(--radius-pill);">
+              <button class="btn btn-outline active" id="tab-signup" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">회원가입</button>
+              <button class="btn btn-outline" id="tab-signin" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">로그인</button>
+            </div>
+
+            <form id="auth-form" onsubmit="window.submitAuthForm(); return false;">
+              <div id="signup-name-group" style="display: block; margin-bottom: 12px;">
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">성함 / 닉네임</label>
+                <input type="text" id="auth-name-input" class="chronos-input" placeholder="홍길동" style="width: 100%;">
+              </div>
+
+              <div style="margin-bottom: 12px;">
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">이메일 주소</label>
+                <input type="email" id="auth-email-input" class="chronos-input" placeholder="user@example.com" required style="width: 100%;">
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">비밀번호 (6자 이상)</label>
+                <input type="password" id="auth-password-input" class="chronos-input" placeholder="••••••••" required minlength="6" style="width: 100%;">
+              </div>
+
+              <button type="button" class="btn btn-engage" id="auth-submit-btn" onclick="window.submitAuthForm()" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; cursor: pointer;">
+                <i class="fa-solid fa-user-plus"></i> 회원가입
+              </button>
+            </form>
+          </div>
+
+          <!-- Supabase Config Card -->
+          <div class="feedback-field-card" style="padding: 20px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h3 style="font-size: 1.1rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-cloud" style="color: var(--accent-mint);"></i> Supabase 연결 상태
+              </h3>
+              <span class="chronos-badge badge-mint" id="supabase-status-badge">클라우드 연결됨</span>
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
+              Supabase Project REST API URL 및 Publishable Key(Anon Key)가 연결되어 실시간 멀티 디바이스 동기화를 지원합니다.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Project REST API URL</label>
+                <input type="text" id="supabase-url-input" class="chronos-input" value="https://mftamdfgyhtkwqceqmxi.supabase.co" readonly style="width: 100%; font-size: 0.85rem; opacity: 0.8;">
+              </div>
+              <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Publishable Public Key (Anon Key)</label>
+                <input type="password" id="supabase-key-input" class="chronos-input" value="sb_publishable_K4xUxMTg6UbMVOsDyr2Rxw_3TdDTvMB" style="width: 100%; font-size: 0.85rem;">
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline" id="save-supabase-config-btn" style="width: 100%; padding: 10px; color: var(--accent-mint); border-color: var(--accent-mint); cursor: pointer;">
+              <i class="fa-solid fa-plug"></i> Supabase 연동 정보 저장
+            </button>
+          </div>
+        </div>
+
+        <div class="step-footer-actions" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center;">
+          <a href="index.html" class="btn btn-outline" style="text-decoration: none;">
+            <i class="fa-solid fa-chevron-left"></i> Playboard 메인으로
+          </a>
+          <a href="pages-list.html" class="btn btn-engage" style="text-decoration: none;">
+            전체 화면 목록 보기 <i class="fa-solid fa-list"></i>
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="app.js"></script>
+</body>
+</html>
