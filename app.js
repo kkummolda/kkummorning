@@ -1686,50 +1686,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ------------------------------------------------------------------------
-  // FIRST-TIME USER WELCOME & IDENTIFICATION MODAL ENGINE
+  // TOAST NOTIFICATIONS
   // ------------------------------------------------------------------------
-  function checkFirstTimeUser() {
-    if (!state.user_profile.user_name || !state.user_profile.user_email) {
-      const welcomeModal = document.getElementById('user-welcome-modal');
-      if (welcomeModal) welcomeModal.classList.add('active');
-    }
-  }
-
-  const saveWelcomeBtn = document.getElementById('save-user-welcome-btn');
-  if (saveWelcomeBtn) {
-    saveWelcomeBtn.addEventListener('click', () => {
-      const name = document.getElementById('welcome-user-name-input').value.trim();
-      const email = document.getElementById('welcome-user-email-input').value.trim();
-
-      if (!name || !email) {
-        showToast('성함(닉네임)과 식별 이메일/연락처를 모두 입력해 주세요.', 'error');
-        return;
-      }
-
-      state.user_profile.user_name = name;
-      state.user_profile.user_email = email;
-      state.user_profile.user_id = email;
-      saveState();
-      syncToSupabase();
-      updateUI();
-
-      const welcomeModal = document.getElementById('user-welcome-modal');
-      if (welcomeModal) welcomeModal.classList.remove('active');
-      showToast(`${name} 님의 작성자 프로필이 등록되었습니다! ✨`, 'success');
-    });
-  }
-
-  const headerProfilePill = document.getElementById('header-user-profile');
-  if (headerProfilePill) {
-    headerProfilePill.addEventListener('click', () => {
-      const nameInput = document.getElementById('welcome-user-name-input');
-      const emailInput = document.getElementById('welcome-user-email-input');
-      if (nameInput) nameInput.value = state.user_profile.user_name || '';
-      if (emailInput) emailInput.value = state.user_profile.user_email || '';
-      const welcomeModal = document.getElementById('user-welcome-modal');
-      if (welcomeModal) welcomeModal.classList.add('active');
-    });
-  }
 
   function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
@@ -1764,5 +1722,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI & Check Welcome Modal
   updateTimerDisplay();
   updateUI();
-  checkFirstTimeUser();
 });
