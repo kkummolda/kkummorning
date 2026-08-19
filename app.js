@@ -660,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Save Daily Feedback Function
-  function saveDailyFeedback() {
+  async function saveDailyFeedback() {
     const dateStr = feedbackDateInput.value;
     const existingIndex = state.daily_logs.findIndex(l => l.date === dateStr);
 
@@ -686,8 +686,9 @@ document.addEventListener('DOMContentLoaded', () => {
       state.daily_logs.push(newLog);
     }
 
-    saveState();
-    syncToSupabase();
+    saveStateToLocalStorage();
+    await saveDailyFeedbackToSupabase(newLog);
+    updateUI();
     showToast(`Day ${dayNum} 피드백이 저장되었습니다! 💾`, 'success');
 
     // Check if 21 days completed
@@ -698,14 +699,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Delete Daily Feedback Function
-  function deleteDailyFeedback() {
+  async function deleteDailyFeedback() {
     const dateStr = feedbackDateInput.value;
     const logIndex = state.daily_logs.findIndex(l => l.date === dateStr);
 
     if (logIndex >= 0) {
       if (confirm(`${dateStr} 피드백 기록을 정말 삭제하시겠습니까?`)) {
         state.daily_logs.splice(logIndex, 1);
-        saveState();
+        saveStateToLocalStorage();
+        await deleteDailyFeedbackFromSupabase(dateStr);
+        updateUI();
         showToast(`${dateStr} 피드백이 삭제되었습니다.`, 'info');
       }
     }
@@ -856,8 +859,8 @@ document.addEventListener('DOMContentLoaded', () => {
     editGoalsModal.classList.remove('active');
   });
 
-  document.getElementById('save-goals-modal-btn').addEventListener('click', () => {
-    state.user_profile.user_id = document.getElementById('input-user-name').value.trim() || '드림러';
+  document.getElementById('save-goals-modal-btn').addEventListener('click', async () => {
+    state.user_profile.user_name = document.getElementById('input-user-name').value.trim() || '드림러';
     state.user_profile.one_word = document.getElementById('input-oneword').value.trim() || '경청';
     state.user_profile.one_word_quote = document.getElementById('input-oneword-quote').value.trim() || '나다움을 찾아가는 삶';
     state.user_profile.four_area_goals.self = document.getElementById('input-goal-self').value.trim();
@@ -865,9 +868,11 @@ document.addEventListener('DOMContentLoaded', () => {
     state.user_profile.four_area_goals.society = document.getElementById('input-goal-society').value.trim();
     state.user_profile.four_area_goals.soul = document.getElementById('input-goal-soul').value.trim();
 
-    saveState();
+    saveStateToLocalStorage();
+    await saveProfileToSupabase();
+    updateUI();
     editGoalsModal.classList.remove('active');
-    showToast('원워드 및 4영역 다짐이 저장되었습니다!', 'success');
+    showToast('원워드 및 4영역 다짐이 Supabase 클라우드에 저장되었습니다! ☁️', 'success');
   });
 
   // ------------------------------------------------------------------------
@@ -1007,9 +1012,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ------------------------------------------------------------------------
-  // 11. SUPABASE CLOUD BACKEND ENGINE & SYNC
+  // 11. SUPABASE AUTHENTICATION & POSTGRES REAL DATABASE ENGINE
   // ------------------------------------------------------------------------
   let supabaseClient = null;
+  let currentSession = null;
+  let currentUser = null;
+  let activeAuthTab = 'signin'; // 'signin' or 'signup'
 
   function updateSupabaseUI(isConnected) {
     const badge = document.getElementById('supabase-status-badge');
@@ -1027,23 +1035,30 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badge) {
       if (isConnected) {
         badge.className = 'chronos-badge badge-mint';
-        badge.innerHTML = '<i class="fa-solid fa-cloud"></i> 연동 완료';
+        badge.innerHTML = '<i class="fa-solid fa-cloud"></i> DB 연결됨';
         if (syncBtn) syncBtn.style.display = 'inline-flex';
       } else {
         badge.className = 'chronos-badge badge-coral';
-        badge.textContent = '미연동 (로컬 전용)';
+        badge.textContent = 'API Key 미설정';
         if (syncBtn) syncBtn.style.display = 'none';
       }
     }
   }
 
   function initSupabaseClient() {
-    const url = state.supabase_config?.url;
-    const key = state.supabase_config?.anon_key;
+    const config = window.DREAM_MORNING_CONFIG || {};
+    const url = config.url || (state.supabase_config && state.supabase_config.url) || 'https://mftamdfgyhtkwqceqmxi.supabase.co';
+    const anonKey = config.anonKey || (state.supabase_config && state.supabase_config.anon_key) || '';
 
-    if (url && key && window.supabase && window.supabase.createClient) {
+    if (window.supabase && window.supabase.createClient && url && anonKey) {
       try {
-        supabaseClient = window.supabase.createClient(url, key);
+        supabaseClient = window.supabase.createClient(url, anonKey, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        });
         updateSupabaseUI(true);
         return true;
       } catch (e) {
@@ -1059,47 +1074,346 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function syncToSupabase(isManual = false) {
+  async function setupSupabaseAuth() {
+    if (!initSupabaseClient()) {
+      console.warn('Supabase Client not ready yet. Please configure Anon Key.');
+      return;
+    }
+
+    // Supabase Auth State Listener
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      console.log('Supabase Auth Event:', event, session);
+      currentSession = session;
+      currentUser = session ? session.user : null;
+
+      updateAuthUI(currentUser);
+
+      if (event === 'SIGNED_IN' && currentUser) {
+        showGlobalLoading('Supabase 클라우드 데이터 불러오는 중...');
+        await loadDataFromSupabase(currentUser.id);
+        await checkAndMigrateLocalStorage(currentUser);
+        hideGlobalLoading();
+      } else if (event === 'SIGNED_OUT') {
+        state = createDefaultState();
+        updateUI();
+      }
+    });
+
+    // Check Existing Session
+    try {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (session) {
+        currentSession = session;
+        currentUser = session.user;
+        updateAuthUI(currentUser);
+        showGlobalLoading('Supabase 클라우드 데이터 불러오는 중...');
+        await loadDataFromSupabase(currentUser.id);
+        await checkAndMigrateLocalStorage(currentUser);
+        hideGlobalLoading();
+      } else {
+        updateAuthUI(null);
+      }
+    } catch (e) {
+      console.error('Session restore error:', e);
+      hideGlobalLoading();
+    }
+  }
+
+  function updateAuthUI(user) {
+    const authBtn = document.getElementById('open-auth-modal-btn');
+    const profilePill = document.getElementById('header-user-profile');
+    const headerUserName = document.getElementById('header-user-name');
+
+    if (user) {
+      if (authBtn) authBtn.style.display = 'none';
+      if (profilePill) profilePill.style.display = 'inline-flex';
+
+      const displayName = user.user_metadata?.user_name || state.user_profile.user_name || user.email?.split('@')[0] || 'Dreamer';
+      if (headerUserName) headerUserName.textContent = displayName;
+      document.getElementById('display-user-id').textContent = displayName;
+    } else {
+      if (authBtn) authBtn.style.display = 'inline-flex';
+      if (profilePill) profilePill.style.display = 'none';
+      document.getElementById('display-user-id').textContent = 'Guest (로그인 필요)';
+    }
+  }
+
+  // Auth Operations: Sign In, Sign Up, Sign Out
+  async function handleSignIn(email, password) {
     if (!supabaseClient) {
-      if (isManual) showToast('Supabase URL 및 Key를 먼저 연동해 주세요.', 'error');
+      showToast('Supabase Client가 설정되지 않았습니다. API Key를 확인해 주세요.', 'error');
+      return;
+    }
+
+    showGlobalLoading('로그인 중입니다...');
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      showToast(`${data.user.email} 님 환영합니다! 🎉`, 'success');
+      document.getElementById('auth-modal').classList.remove('active');
+    } catch (err) {
+      console.error('Sign in error:', err);
+      showToast(`로그인 실패: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
+    } finally {
+      hideGlobalLoading();
+    }
+  }
+
+  async function handleSignUp(email, password, userName) {
+    if (!supabaseClient) {
+      showToast('Supabase Client가 설정되지 않았습니다. API Key를 확인해 주세요.', 'error');
+      return;
+    }
+
+    showGlobalLoading('회원가입 중입니다...');
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            user_name: userName || email.split('@')[0]
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        state.user_profile.user_id = data.user.id;
+        state.user_profile.user_name = userName || email.split('@')[0];
+        state.user_profile.user_email = email;
+
+        // Upsert Initial Profile to public.user_profiles
+        await saveProfileToSupabase();
+        showToast('회원가입이 완료되었습니다! 🚀', 'success');
+        document.getElementById('auth-modal').classList.remove('active');
+      }
+    } catch (err) {
+      console.error('Sign up error:', err);
+      showToast(`회원가입 실패: ${err.message}`, 'error');
+    } finally {
+      hideGlobalLoading();
+    }
+  }
+
+  async function handleSignOut() {
+    if (!supabaseClient) return;
+    if (confirm('정말 로그아웃 하시겠습니까?')) {
+      showGlobalLoading('로그아웃 중...');
+      try {
+        await supabaseClient.auth.signOut();
+        showToast('성공적으로 로그아웃되었습니다.', 'info');
+      } catch (err) {
+        console.error('Sign out error:', err);
+      } finally {
+        hideGlobalLoading();
+      }
+    }
+  }
+
+  // Load User Data from Supabase Postgres Database (Source of Truth)
+  async function loadDataFromSupabase(userId) {
+    if (!supabaseClient || !userId) return;
+
+    try {
+      // 1. Fetch user_profiles
+      const { data: profile, error: pErr } = await supabaseClient
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (pErr) {
+        console.error('Fetch profile error:', pErr);
+      } else if (profile) {
+        state.user_profile.user_id = profile.user_id;
+        state.user_profile.user_name = profile.user_name || currentUser.user_metadata?.user_name || currentUser.email?.split('@')[0];
+        state.user_profile.user_email = profile.email || currentUser.email;
+        state.user_profile.one_word = profile.oneword || state.user_profile.one_word;
+        state.user_profile.one_word_quote = profile.oneword_quote || state.user_profile.one_word_quote;
+        state.user_profile.four_area_goals.self = profile.goal_self || state.user_profile.four_area_goals.self;
+        state.user_profile.four_area_goals.family = profile.goal_family || state.user_profile.four_area_goals.family;
+        state.user_profile.four_area_goals.society = profile.goal_society || state.user_profile.four_area_goals.society;
+        state.user_profile.four_area_goals.soul = profile.goal_soul || state.user_profile.four_area_goals.soul;
+        if (profile.sound_type) state.sound_settings.sound_type = profile.sound_type;
+        if (profile.volume !== null && profile.volume !== undefined) state.sound_settings.volume = profile.volume;
+      }
+
+      // 2. Fetch daily_logs
+      const { data: logs, error: lErr } = await supabaseClient
+        .from('daily_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: true });
+
+      if (lErr) {
+        console.error('Fetch daily logs error:', lErr);
+      } else if (logs) {
+        state.daily_logs = logs.map(l => ({
+          day: l.day,
+          date: l.date,
+          created_at: l.created_at,
+          self_feedback: l.self_feedback || '',
+          family_feedback: l.family_feedback || '',
+          society_feedback: l.society_feedback || '',
+          soul_feedback: l.soul_feedback || '',
+          one_sentence_summary: l.one_sentence_summary || ''
+        }));
+      }
+
+      updateUI();
+    } catch (e) {
+      console.error('Load data from Supabase error:', e);
+    }
+  }
+
+  // Upsert Profile to public.user_profiles Table
+  async function saveProfileToSupabase() {
+    if (!supabaseClient || !currentUser) {
+      saveStateToLocalStorage();
       return;
     }
 
     try {
-      if (isManual) showToast('Supabase 클라우드 동기화 중...', 'info');
-
-      // 1. Upsert User Profile
-      const userId = state.user_profile.user_email || state.user_profile.user_id || 'guest@dream.com';
-      const userName = state.user_profile.user_name || 'Dreamer';
-
-      const profileData = {
-        user_id: userId,
-        user_name: userName,
-        email: state.user_profile.user_email || userId,
-        oneword: state.user_profile.one_word || '경청',
-        oneword_quote: state.user_profile.one_word_quote || '',
-        goal_self: state.user_profile.four_area_goals.self || '',
-        goal_family: state.user_profile.four_area_goals.family || '',
-        goal_society: state.user_profile.four_area_goals.society || '',
-        goal_soul: state.user_profile.four_area_goals.soul || '',
-        sound_type: state.sound_settings.sound_type || 'rain',
-        volume: state.sound_settings.volume || 0.4,
+      const payload = {
+        user_id: currentUser.id,
+        user_name: state.user_profile.user_name || currentUser.user_metadata?.user_name || currentUser.email.split('@')[0],
+        email: currentUser.email,
+        oneword: state.user_profile.one_word,
+        oneword_quote: state.user_profile.one_word_quote,
+        goal_self: state.user_profile.four_area_goals.self,
+        goal_family: state.user_profile.four_area_goals.family,
+        goal_society: state.user_profile.four_area_goals.society,
+        goal_soul: state.user_profile.four_area_goals.soul,
+        sound_type: state.sound_settings.sound_type,
+        volume: state.sound_settings.volume,
         updated_at: new Date().toISOString()
       };
 
-      const { error: profileErr } = await supabaseClient
+      const { error } = await supabaseClient
         .from('user_profiles')
-        .upsert(profileData, { onConflict: 'user_id' });
+        .upsert(payload, { onConflict: 'user_id' });
 
-      if (profileErr) throw profileErr;
+      if (error) throw error;
+      saveStateToLocalStorage();
+    } catch (err) {
+      console.error('Save profile to Supabase error:', err);
+      showToast('저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+    }
+  }
 
-      // 2. Upsert Daily Logs
-      if (state.daily_logs && state.daily_logs.length > 0) {
-        const logsArray = state.daily_logs.map(log => ({
-          user_id: userId,
-          user_name: userName,
-          date: log.date,
+  // Upsert Daily Log to public.daily_logs Table
+  async function saveDailyFeedbackToSupabase(log) {
+    if (!supabaseClient || !currentUser) {
+      showToast('로그인이 필요합니다. 로그인 후 저장해 주세요.', 'error');
+      openAuthModal();
+      return;
+    }
+
+    try {
+      const payload = {
+        user_id: currentUser.id,
+        user_name: state.user_profile.user_name || currentUser.user_metadata?.user_name || currentUser.email.split('@')[0],
+        day: log.day,
+        date: log.date,
+        self_feedback: log.self_feedback || '',
+        family_feedback: log.family_feedback || '',
+        society_feedback: log.society_feedback || '',
+        soul_feedback: log.soul_feedback || '',
+        one_sentence_summary: log.one_sentence_summary || '',
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabaseClient
+        .from('daily_logs')
+        .upsert(payload, { onConflict: 'user_id,date' });
+
+      if (error) throw error;
+      saveStateToLocalStorage();
+    } catch (err) {
+      console.error('Save daily log to Supabase error:', err);
+      showToast('일기 저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+    }
+  }
+
+  // Delete Daily Log from public.daily_logs Table
+  async function deleteDailyFeedbackFromSupabase(dateStr) {
+    if (!supabaseClient || !currentUser) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from('daily_logs')
+        .delete()
+        .eq('user_id', currentUser.id)
+        .eq('date', dateStr);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Delete daily log error:', err);
+      showToast('삭제 중 문제가 발생했습니다.', 'error');
+    }
+  }
+
+  // 1-Time Migration from LocalStorage to Supabase Real DB
+  async function checkAndMigrateLocalStorage(user) {
+    const MIGRATION_FLAG = `dream_morning_supabase_migrated_${user.id}`;
+    if (localStorage.getItem(MIGRATION_FLAG) === 'true') return;
+
+    const localDataRaw = localStorage.getItem(STORAGE_KEY);
+    if (!localDataRaw) return;
+
+    try {
+      const localData = JSON.parse(localDataRaw);
+      if (!localData || !localData.daily_logs || localData.daily_logs.length === 0) {
+        localStorage.setItem(MIGRATION_FLAG, 'true');
+        return;
+      }
+
+      // Check if user already has logs in Supabase
+      const { count, error: countErr } = await supabaseClient
+        .from('daily_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (countErr) {
+        console.error('Migration count check error:', countErr);
+        return;
+      }
+
+      if (count === 0 && localData.daily_logs.length > 0) {
+        showToast('기존 로컬 일지를 Supabase 클라우드로 이전 중입니다... 📦', 'info');
+
+        // Migrate Profile
+        if (localData.user_profile) {
+          const profilePayload = {
+            user_id: user.id,
+            user_name: localData.user_profile.user_name || user.email.split('@')[0],
+            email: user.email,
+            oneword: localData.user_profile.one_word || '경청',
+            oneword_quote: localData.user_profile.one_word_quote || '',
+            goal_self: localData.user_profile.four_area_goals?.self || '',
+            goal_family: localData.user_profile.four_area_goals?.family || '',
+            goal_society: localData.user_profile.four_area_goals?.society || '',
+            goal_soul: localData.user_profile.four_area_goals?.soul || '',
+            sound_type: localData.sound_settings?.sound_type || 'rain',
+            volume: localData.sound_settings?.volume || 0.4,
+            updated_at: new Date().toISOString()
+          };
+          await supabaseClient.from('user_profiles').upsert(profilePayload, { onConflict: 'user_id' });
+        }
+
+        // Migrate Logs
+        const logsPayload = localData.daily_logs.map(log => ({
+          user_id: user.id,
+          user_name: localData.user_profile?.user_name || user.email.split('@')[0],
           day: log.day,
+          date: log.date,
           self_feedback: log.self_feedback || '',
           family_feedback: log.family_feedback || '',
           society_feedback: log.society_feedback || '',
@@ -1108,54 +1422,104 @@ document.addEventListener('DOMContentLoaded', () => {
           updated_at: new Date().toISOString()
         }));
 
-        const { error: logsErr } = await supabaseClient
+        const { error: batchErr } = await supabaseClient
           .from('daily_logs')
-          .upsert(logsArray, { onConflict: 'user_id,date' });
+          .upsert(logsPayload, { onConflict: 'user_id,date' });
 
-        if (logsErr) throw logsErr;
+        if (batchErr) throw batchErr;
+
+        localStorage.setItem(MIGRATION_FLAG, 'true');
+        showToast('기존 로컬 기록이 Supabase 클라우드로 안전하게 마이그레이션되었습니다! ☁️✨', 'success');
+        await loadDataFromSupabase(user.id);
+      } else {
+        localStorage.setItem(MIGRATION_FLAG, 'true');
       }
-
-      updateSupabaseUI(true);
-      if (isManual) showToast('Supabase 클라우드 동기화 완료! ☁️', 'success');
     } catch (err) {
-      console.error('Supabase sync error:', err);
-      if (isManual) showToast(`동기화 실패: SQL 테이블이 생성되어 있는지 확인해 주세요.`, 'error');
+      console.error('Migration error:', err);
     }
   }
 
-  // Supabase Configuration Buttons Listeners
-  const saveSupabaseBtn = document.getElementById('save-supabase-config-btn');
-  if (saveSupabaseBtn) {
-    saveSupabaseBtn.addEventListener('click', async () => {
-      const url = document.getElementById('supabase-url-input').value.trim();
-      const key = document.getElementById('supabase-key-input').value.trim();
+  // Auth Modal Controls
+  function openAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) modal.classList.add('active');
+  }
 
-      if (!url || !key) {
-        showToast('Supabase URL과 Anon Key를 모두 입력해 주세요.', 'error');
+  const openAuthBtn = document.getElementById('open-auth-modal-btn');
+  if (openAuthBtn) openAuthBtn.addEventListener('click', openAuthModal);
+
+  const closeAuthBtn = document.getElementById('close-auth-modal');
+  if (closeAuthBtn) {
+    closeAuthBtn.addEventListener('click', () => {
+      document.getElementById('auth-modal').classList.remove('active');
+    });
+  }
+
+  const tabSignin = document.getElementById('tab-signin');
+  const tabSignup = document.getElementById('tab-signup');
+  const nameGroup = document.getElementById('signup-name-group');
+  const submitBtn = document.getElementById('auth-submit-btn');
+
+  if (tabSignin && tabSignup) {
+    tabSignin.addEventListener('click', () => {
+      activeAuthTab = 'signin';
+      tabSignin.classList.add('active');
+      tabSignup.classList.remove('active');
+      if (nameGroup) nameGroup.style.display = 'none';
+      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> 로그인';
+    });
+
+    tabSignup.addEventListener('click', () => {
+      activeAuthTab = 'signup';
+      tabSignup.classList.add('active');
+      tabSignin.classList.remove('active');
+      if (nameGroup) nameGroup.style.display = 'block';
+      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> 회원가입';
+    });
+  }
+
+  if (submitBtn) {
+    submitBtn.addEventListener('click', () => {
+      const email = document.getElementById('auth-email-input').value.trim();
+      const password = document.getElementById('auth-password-input').value.trim();
+      const name = document.getElementById('auth-name-input')?.value.trim();
+
+      if (!email || !password) {
+        showToast('이메일과 비밀번호를 입력해 주세요.', 'error');
         return;
       }
 
-      state.supabase_config = { url, anon_key: key };
-      saveState();
-
-      if (initSupabaseClient()) {
-        showToast('Supabase 연동 정보가 저장되었습니다! 동기화를 시작합니다.', 'info');
-        await syncToSupabase(true);
+      if (activeAuthTab === 'signin') {
+        handleSignIn(email, password);
       } else {
-        showToast('Supabase 연동 실패. URL과 Key를 다시 확인해 주세요.', 'error');
+        handleSignUp(email, password, name);
       }
     });
   }
 
-  const manualSyncBtn = document.getElementById('manual-sync-supabase-btn');
-  if (manualSyncBtn) {
-    manualSyncBtn.addEventListener('click', () => {
-      syncToSupabase(true);
+  const logoutIcon = document.getElementById('header-logout-icon');
+  if (logoutIcon) logoutIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleSignOut();
+  });
+
+  const saveSupabaseConfigBtn = document.getElementById('save-supabase-config-btn');
+  if (saveSupabaseConfigBtn) {
+    saveSupabaseConfigBtn.addEventListener('click', async () => {
+      const key = document.getElementById('supabase-key-input').value.trim();
+      if (!key) {
+        showToast('Anon Public Key를 입력해 주세요.', 'error');
+        return;
+      }
+      localStorage.setItem('dream_morning_supabase_anon_key', key);
+      state.supabase_config.anon_key = key;
+      showToast('Supabase API Key가 저장되었습니다. 세션을 연동합니다.', 'info');
+      await setupSupabaseAuth();
     });
   }
 
-  // Initialize Supabase Client on Boot
-  initSupabaseClient();
+  // Initialize Supabase Auth Engine
+  setupSupabaseAuth();
 
   // ------------------------------------------------------------------------
   // 11. CONFETTI EFFECT FOR CELEBRATION
