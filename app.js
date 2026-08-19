@@ -1203,11 +1203,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (error) throw error;
 
+      currentSession = data.session;
+      currentUser = data.user;
+      state.user_profile.user_id = data.user.id;
+      state.user_profile.user_email = data.user.email;
+      
+      updateAuthUI(data.user);
       showToast(`${data.user.email} 님 환영합니다! 🎉`, 'success');
       document.getElementById('auth-modal').classList.remove('active');
+      await loadDataFromSupabase(data.user.id);
     } catch (err) {
       console.error('Sign in error:', err);
-      showToast(`로그인 실패: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
+      showToast(`로그인 안내: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
     } finally {
       hideGlobalLoading();
     }
@@ -1235,7 +1242,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      if (error) throw error;
+      // If user is already registered in Supabase, automatically sign in with same password!
+      if (error && (error.message?.toLowerCase().includes('already registered') || error.status === 400)) {
+        showGlobalLoading('이미 생성된 계정입니다. 로그인 진행 중...');
+        const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (signInErr) {
+          throw new Error('이미 회원가입된 이메일입니다. 비밀번호를 확인하시고 [로그인] 탭에서 로그인해 주세요.');
+        } else {
+          currentSession = signInData.session;
+          currentUser = signInData.user;
+          updateAuthUI(signInData.user);
+          showToast(`${userName || email} 님 로그인되었습니다! 🎉`, 'success');
+          document.getElementById('auth-modal').classList.remove('active');
+          await loadDataFromSupabase(signInData.user.id);
+          return;
+        }
+      } else if (error) {
+        throw error;
+      }
 
       if (data.user) {
         // Auto sign-in if session is not automatically established by Supabase
@@ -1292,7 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Sign up error:', err);
-      showToast(`회원가입 안내: ${err.message || '오류가 발생했습니다. 이메일/비밀번호를 확인해주세요.'}`, 'error');
+      showToast(`가입/로그인 안내: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
     } finally {
       hideGlobalLoading();
     }
