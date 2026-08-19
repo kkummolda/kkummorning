@@ -1471,15 +1471,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Auth Modal Controls
-  function openAuthModal() {
+  // Auth Modal Controls (Exposed globally for instant inline onclick support)
+  window.openAuthModal = function() {
+    console.log('openAuthModal triggered');
     document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
     const modal = document.getElementById('auth-modal');
-    if (modal) modal.classList.add('active');
-  }
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+    }
+  };
 
   const openAuthBtn = document.getElementById('open-auth-modal-btn');
-  if (openAuthBtn) openAuthBtn.addEventListener('click', openAuthModal);
+  if (openAuthBtn) openAuthBtn.addEventListener('click', window.openAuthModal);
 
   const closeAuthBtn = document.getElementById('close-auth-modal');
   if (closeAuthBtn) {
