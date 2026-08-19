@@ -1960,12 +1960,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('stat-streak-count').textContent = `${realStreak}일`;
     document.getElementById('stat-completion-rate').textContent = `${progressPercent}%`;
 
-    const totalWords = state.daily_logs.reduce((acc, log) => {
-      return acc + (log.self_feedback?.length || 0) + (log.family_feedback?.length || 0) + 
-                   (log.society_feedback?.length || 0) + (log.soul_feedback?.length || 0);
-    }, 0);
-    document.getElementById('stat-total-words').textContent = `${totalWords.toLocaleString()}자`;
-
     const lockBadge = document.getElementById('reflection-lock-badge');
     if (lockBadge) {
       if (completedCount >= 21) {
