@@ -586,6 +586,7 @@
     <div class="modal-card" style="max-width: 440px;">
       <div class="modal-header">
         <h3>🌙 꿈모닝 피드백 시작하기</h3>
+        <button class="modal-close-btn" id="close-welcome-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
@@ -606,6 +607,13 @@
         <button class="btn btn-engage" id="save-user-welcome-btn" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;">
           🚀 21일 챌린지 시작하기
         </button>
+
+        <div style="text-align: center; margin-top: 14px; font-size: 0.84rem; color: var(--text-muted);">
+          Supabase 계정이 있으신가요? 
+          <button type="button" id="welcome-to-auth-btn" style="background: none; border: none; color: var(--accent-blue); text-decoration: underline; cursor: pointer; font-size: 0.84rem; padding: 0 4px;">
+            <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 회원가입
+          </button>
+        </div>
       </div>
     </div>
   </div>

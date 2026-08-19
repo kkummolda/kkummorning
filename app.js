@@ -1473,6 +1473,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auth Modal Controls
   function openAuthModal() {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
     const modal = document.getElementById('auth-modal');
     if (modal) modal.classList.add('active');
   }
@@ -1484,6 +1485,23 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeAuthBtn) {
     closeAuthBtn.addEventListener('click', () => {
       document.getElementById('auth-modal').classList.remove('active');
+    });
+  }
+
+  const closeWelcomeBtn = document.getElementById('close-welcome-modal');
+  if (closeWelcomeBtn) {
+    closeWelcomeBtn.addEventListener('click', () => {
+      const welcomeModal = document.getElementById('user-welcome-modal');
+      if (welcomeModal) welcomeModal.classList.remove('active');
+    });
+  }
+
+  const welcomeToAuthBtn = document.getElementById('welcome-to-auth-btn');
+  if (welcomeToAuthBtn) {
+    welcomeToAuthBtn.addEventListener('click', () => {
+      const welcomeModal = document.getElementById('user-welcome-modal');
+      if (welcomeModal) welcomeModal.classList.remove('active');
+      openAuthModal();
     });
   }
 
