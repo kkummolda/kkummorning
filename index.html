@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>꿈모닝 - AI 네이티브 Playboard 통합 메인 상황판</title>
-  <meta name="description" content="매일 밤 자기 전 5분, 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 AI 네이티브 Playboard 통합 상황판입니다.">
+  <title>꿈모닝 - 매일 밤 5분, 나다운 삶을 가꾸는 21일 회고</title>
+  <meta name="description" content="매일 밤 자기 전 5분, 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 서비스입니다.">
   <meta name="theme-color" content="#0b0e17">
   <!-- Mobile Smartphone & PWA Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="꿈모닝 Playboard">
+  <meta name="apple-mobile-web-app-title" content="꿈모닝">
   <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,87 +20,34 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .playboard-status-banner {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
-      border: 1px solid var(--border-hairline);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-    .status-pill-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .status-pill-item {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 6px 14px;
-      border-radius: var(--radius-pill);
-      font-size: 0.82rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #fff;
-    }
-    .playboard-grid-section {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    .playboard-section-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      transition: all 0.25s ease;
-    }
-    .playboard-section-card:hover {
-      border-color: var(--accent-blue);
-      background: rgba(255, 255, 255, 0.05);
-    }
-    .playboard-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-  </style>
 </head>
 <body>
-  <!-- Ambient Canvas -->
+  <!-- Ambient Particle Canvas -->
   <canvas id="ambient-canvas"></canvas>
 
   <div class="app-container">
-    <!-- TOP HEADER BAR (Playboard Style Header) -->
+    <!-- TOP HEADER BAR (Customer App Header) -->
     <header class="app-header">
       <div class="header-brand">
         <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
           <div class="logo-icon">🌙</div>
           <div class="brand-text">
-            <h1>꿈모닝 <span style="font-size: 0.75rem; color: var(--accent-mint); font-weight: 600;">Playboard</span></h1>
+            <h1>꿈모닝</h1>
           </div>
         </a>
       </div>
 
       <!-- Center Stepper Navigation -->
       <nav class="stepper-nav-header">
-        <button class="nav-link-btn active" data-step="1" id="tab-step-1">마음 보기</button>
-        <button class="nav-link-btn" data-step="2" id="tab-step-2">가치 생각</button>
-        <button class="nav-link-btn" data-step="3" id="tab-step-3">일일 피드백</button>
-        <button class="nav-link-btn" data-step="4" id="tab-step-4">21일 잔디 & 회고</button>
-        <a href="pages-list.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-list"></i> (b) 화면 목록</a>
-        <a href="ux-flow.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-diagram-project"></i> (c) UX Flow</a>
+        <button class="nav-link-btn active" data-step="1" id="tab-step-1">1. 마음 보기</button>
+        <button class="nav-link-btn" data-step="2" id="tab-step-2">2. 가치 생각</button>
+        <button class="nav-link-btn" data-step="3" id="tab-step-3">3. 일일 피드백</button>
+        <button class="nav-link-btn" data-step="4" id="tab-step-4">4. 21일 잔디</button>
       </nav>
 
-      <!-- Right Actions -->
+      <!-- Right Customer Actions & Admin Playboard Link -->
       <div class="header-status">
-        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
+        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 5px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
           <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 가입
         </button>
         <div class="user-profile-pill" id="header-user-profile" title="프로필 관리 및 로그아웃" style="display: none; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
@@ -116,87 +63,17 @@
         <button class="icon-btn audio-quick-toggle" id="quick-audio-btn" title="사운드 온/오프">
           <i class="fa-solid fa-volume-high"></i>
         </button>
-        <button class="icon-btn backup-btn" id="open-backup-btn" title="데이터 백업 및 설정">
+        <button class="icon-btn backup-btn" id="open-backup-btn" title="설정">
           <i class="fa-solid fa-gear"></i>
         </button>
+        <a href="playboard/index.html" class="btn btn-outline btn-sm" style="text-decoration: none; padding: 4px 10px; font-size: 0.78rem; color: var(--accent-mint); border-color: rgba(52, 211, 153, 0.4);" title="관리자/개발용 상황판 이동">
+          <i class="fa-solid fa-gauge"></i> 관제 Playboard
+        </a>
       </div>
     </header>
 
-    <!-- (d) PLAYBOARD INTEGRATED DASHBOARD BANNER -->
-    <section class="playboard-status-banner" style="margin-top: 14px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-        <div>
-          <span class="chronos-badge badge-blue">AI Native Playboard Dashboard</span>
-          <h2 style="font-size: 1.4rem; font-weight: 700; color: #fff; margin: 8px 0 4px 0;">꿈모닝 애플리케이션 라이브 컨트롤 & 통합 상황판</h2>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0;">전체 요구사항 모니터링, 개별 화면 접근 카탈로그([b]), 사용자 UX Flow([c]) 및 실제 챌린지 실행 통합보드</p>
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <a href="playboard/index.html" class="btn btn-primary btn-glow" style="text-decoration: none; font-size: 0.85rem;">
-            <i class="fa-solid fa-gauge-high"></i> 신규 /playboard 라우트
-          </a>
-          <a href="prototype/index.html" class="btn btn-outline" style="text-decoration: none; font-size: 0.85rem; color: var(--accent-coral); border-color: var(--accent-coral);">
-            <i class="fa-solid fa-box-archive"></i> (정적 /prototype 박제본)
-          </a>
-          <a href="playboard/PRD_SOT.md" target="_blank" class="btn btn-outline" style="text-decoration: none; font-size: 0.85rem; color: var(--accent-mint); border-color: var(--accent-mint);">
-            <i class="fa-solid fa-file-contract"></i> PRD SoT 문서
-          </a>
-        </div>
-      </div>
-
-      <div class="status-pill-grid">
-        <div class="status-pill-item"><i class="fa-solid fa-server" style="color: var(--accent-mint);"></i> Server: <strong>http://localhost:8080</strong></div>
-        <div class="status-pill-item"><i class="fa-solid fa-database" style="color: var(--accent-blue);"></i> Database: <strong>Supabase Postgres (mftamdfgyhtkwqceqmxi)</strong></div>
-        <div class="status-pill-item"><i class="fa-solid fa-mobile-screen-button" style="color: var(--accent-coral);"></i> Mobile UX: <strong>Smartphone iOS/Android Optimized</strong></div>
-        <div class="status-pill-item"><i class="fa-solid fa-shield-halved" style="color: var(--accent-purple);"></i> Auth & RLS: <strong>Row Level Security Active</strong></div>
-      </div>
-    </section>
-
-    <!-- (a) & (b) & (c) PLAYBOARD NAVIGATION CARDS -->
-    <div class="playboard-grid-section">
-      <div class="playboard-section-card">
-        <div class="playboard-card-header">
-          <span class="chronos-badge badge-mint">(a) 개별 화면 프로토타입</span>
-          <a href="pages-list.html" style="font-size: 0.78rem; color: var(--accent-mint); text-decoration: none;">전체보기 <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-        <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">5대 개별 프로토타입 화면</h3>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">화면당 1개의 독립 URL로 제작된 개별 기능 페이지들입니다.</p>
-        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-          <a href="step1-mindfulness.html" class="chronos-badge badge-blue" style="text-decoration: none;">1. 마음보기</a>
-          <a href="step2-values.html" class="chronos-badge badge-coral" style="text-decoration: none;">2. 가치생각</a>
-          <a href="step3-feedback.html" class="chronos-badge badge-mint" style="text-decoration: none;">3. 일일피드백</a>
-          <a href="step4-dashboard.html" class="chronos-badge badge-purple" style="text-decoration: none;">4. 21일잔디</a>
-          <a href="auth.html" class="chronos-badge badge-blue" style="text-decoration: none;">🔐 인증/설정</a>
-        </div>
-      </div>
-
-      <div class="playboard-section-card">
-        <div class="playboard-card-header">
-          <span class="chronos-badge badge-blue">(b) 카탈로그 디렉토리</span>
-          <a href="pages-list.html" style="font-size: 0.78rem; color: var(--accent-blue); text-decoration: none;">목록 열기 <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-        <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">전체 화면 접근 목록</h3>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">모든 프로토타입 페이지의 URL, 라이브 상태 및 담당 기능을 한눈에 확인하는 디렉토리입니다.</p>
-        <a href="pages-list.html" class="btn btn-outline" style="width: 100%; text-decoration: none; justify-content: center; font-size: 0.82rem;">
-          <i class="fa-solid fa-list-check"></i> 목록 카탈로그 페이지 접속
-        </a>
-      </div>
-
-      <div class="playboard-section-card">
-        <div class="playboard-card-header">
-          <span class="chronos-badge badge-coral">(c) UX Flow 시나리오</span>
-          <a href="ux-flow.html" style="font-size: 0.78rem; color: var(--accent-coral); text-decoration: none;">시나리오 보기 <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-        <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 8px;">사용자 유형별 UX Flow</h3>
-        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">신규 챌린저, 매일 밤 회고 작성자, 데이터 분석가 등 페르소나별 시각 카드 이동 흐름 오버뷰입니다.</p>
-        <a href="ux-flow.html" class="btn btn-outline" style="width: 100%; text-decoration: none; justify-content: center; font-size: 0.82rem; color: var(--accent-coral); border-color: var(--accent-coral);">
-          <i class="fa-solid fa-diagram-project"></i> UX Flow 오버뷰 접속
-        </a>
-      </div>
-    </div>
-
-    <!-- Challenge Progress Bar -->
-    <div class="challenge-progress-bar-container">
+    <!-- Customer Challenge Progress Bar -->
+    <div class="challenge-progress-bar-container" style="margin-top: 16px;">
       <div class="progress-info">
         <span>21일 목표 달성도</span>
         <span id="progress-percent-text">0% (0 / 21일 완료)</span>
@@ -206,13 +83,13 @@
       </div>
     </div>
 
-    <!-- MAIN INTERACTIVE VIEWS -->
+    <!-- MAIN APP CUSTOMER VIEWS -->
     <main class="main-content">
       
       <!-- STEP 1: 마음 보기 -->
       <section class="step-view active" id="view-step-1">
         <div class="chronos-banner-card">
-          <div class="step-badge">1단계: 마음 보기 (Mindfulness Process)</div>
+          <div class="step-badge">1단계: 마음 보기 (Mindfulness)</div>
           <h2 class="chronos-banner-title">오늘 하루의 소음을 끄고, 차분하게 마음을 가다듬으세요</h2>
           <p class="chronos-banner-desc">조용한 백색소음이나 힐링 오르골 톤을 틀어두고 깊은 호흡을 3회 진행해보세요.</p>
 
@@ -305,7 +182,7 @@
               </div>
             </div>
 
-            <!-- 4 Goals Vector Grid -->
+            <!-- 4 Goals Grid -->
             <div class="goals-overview-grid">
               <div class="vector-card card-self interactive" data-edit-target="self" title="클릭하여 자아 다짐 수정">
                 <div class="vector-card-header">
@@ -386,9 +263,8 @@
               </div>
             </div>
 
-            <!-- 4 Areas Accordion / Grid Form -->
+            <!-- 4 Areas Grid Form -->
             <div class="feedback-quad-grid">
-              <!-- Area 1: Self -->
               <div class="feedback-field-card card-border-mint">
                 <div class="field-header">
                   <div class="field-icon-title">
@@ -403,7 +279,6 @@
                 <textarea id="feedback-self" class="chronos-textarea" rows="3" placeholder="오늘 나 자신을 위해 행동한 것, 생각의 성찰을 적어보세요."></textarea>
               </div>
 
-              <!-- Area 2: Family -->
               <div class="feedback-field-card card-border-coral">
                 <div class="field-header">
                   <div class="field-icon-title">
@@ -418,7 +293,6 @@
                 <textarea id="feedback-family" class="chronos-textarea" rows="3" placeholder="가족에게 한 따뜻한 말 한마디나 함께한 순간을 기록하세요."></textarea>
               </div>
 
-              <!-- Area 3: Society -->
               <div class="feedback-field-card card-border-blue">
                 <div class="field-header">
                   <div class="field-icon-title">
@@ -433,7 +307,6 @@
                 <textarea id="feedback-society" class="chronos-textarea" rows="3" placeholder="일터나 공동체에서 타인에게 기여하거나 배운 점을 적어보세요."></textarea>
               </div>
 
-              <!-- Area 4: Soul -->
               <div class="feedback-field-card card-border-purple">
                 <div class="field-header">
                   <div class="field-icon-title">
@@ -495,6 +368,26 @@
             <div class="grass-grid-container" id="grass-grid"></div>
           </div>
 
+          <!-- Summary Stats Grid -->
+          <div class="stats-overview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="stat-card">
+              <span class="stat-label">작성한 일기</span>
+              <span class="stat-value" id="stat-completed-days">0 / 21일</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">연속 달성 스트릭</span>
+              <span class="stat-value" id="stat-streak-count">0일</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">목표 달성률</span>
+              <span class="stat-value" id="stat-completion-rate">0%</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">총 성찰 글자수</span>
+              <span class="stat-value" id="stat-total-words">0자</span>
+            </div>
+          </div>
+
           <!-- Past Logs Timeline View -->
           <div class="timeline-logs-card">
             <div class="timeline-header">
@@ -507,18 +400,16 @@
       </section>
     </main>
 
-    <!-- FOOTER LINK NAVIGATION -->
+    <!-- FOOTER -->
     <footer style="margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border-hairline); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
       <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap;">
-        <a href="index.html" style="color: var(--accent-mint); text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard 메인</a>
+        <a href="index.html" style="color: var(--accent-mint); text-decoration: none;"><i class="fa-solid fa-house"></i> 꿈모닝 메인</a>
         <span>•</span>
-        <a href="pages-list.html" style="color: var(--accent-blue); text-decoration: none;"><i class="fa-solid fa-list"></i> (b) 화면 목록 카탈로그</a>
+        <a href="playboard/index.html" style="color: var(--accent-blue); text-decoration: none;"><i class="fa-solid fa-gauge"></i> 관제 Playboard</a>
         <span>•</span>
-        <a href="ux-flow.html" style="color: var(--accent-coral); text-decoration: none;"><i class="fa-solid fa-diagram-project"></i> (c) 사용자 UX Flow</a>
-        <span>•</span>
-        <a href="auth.html" style="color: var(--accent-purple); text-decoration: none;"><i class="fa-solid fa-user-shield"></i> 인증/설정</a>
+        <a href="auth.html" style="color: var(--accent-coral); text-decoration: none;"><i class="fa-solid fa-user-shield"></i> 인증/설정</a>
       </div>
-      <p>© 2026 꿈모닝 5분 피드백 (Dream Morning) — AI Native Playboard Paradigm Project</p>
+      <p>© 2026 꿈모닝 5분 피드백 (Dream Morning) — 21-Day Mindfulness Service</p>
     </footer>
   </div>
 
@@ -527,10 +418,14 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3>원워드 & 4대 영역 다짐 수정</h3>
-        <button class="modal-close-btn" id="close-edit-goals-modal"><i class="fa-solid fa-xmark"></i></button>
+        <button class="modal-close-btn" id="close-goals-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <form id="edit-goals-form" onsubmit="return false;">
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">작성자 닉네임 / 성함</label>
+            <input type="text" id="input-user-name" class="chronos-input" placeholder="홍길동" style="width: 100%;">
+          </div>
           <div style="margin-bottom: 12px;">
             <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">나의 원워드 (One Word)</label>
             <input type="text" id="input-oneword" class="chronos-input" placeholder="예: 경청, 몰입, 사랑" style="width: 100%;">
@@ -560,8 +455,9 @@
             </div>
           </div>
 
-          <div style="margin-top: 20px; text-align: right;">
-            <button type="button" class="btn btn-engage" id="save-goals-btn">
+          <div style="margin-top: 20px; text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" class="btn btn-outline" id="cancel-goals-modal">취소</button>
+            <button type="button" class="btn btn-engage" id="save-goals-modal-btn">
               <i class="fa-solid fa-floppy-disk"></i> 원워드 & 다짐 저장하기
             </button>
           </div>
@@ -574,13 +470,13 @@
   <div class="modal-overlay" id="auth-modal">
     <div class="modal-card" style="max-width: 440px;">
       <div class="modal-header">
-        <h3 id="auth-modal-title">Supabase 클라우드 회원가입 / 로그인</h3>
+        <h3 id="auth-modal-title">Supabase 회원가입 / 로그인</h3>
         <button class="modal-close-btn" id="close-auth-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
         <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: var(--radius-pill);">
-          <button class="btn btn-outline" id="tab-signin" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">로그인</button>
           <button class="btn btn-outline active" id="tab-signup" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">회원가입</button>
+          <button class="btn btn-outline" id="tab-signin" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">로그인</button>
         </div>
 
         <form id="auth-form" onsubmit="window.submitAuthForm(); return false;">
@@ -611,7 +507,7 @@
   <div class="modal-overlay" id="backup-modal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>데이터 백업 & Supabase 연동 설정</h3>
+        <h3>설정 & Supabase DB 연동</h3>
         <button class="modal-close-btn" id="close-backup-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
@@ -620,24 +516,32 @@
             <span><i class="fa-solid fa-cloud" style="color: var(--accent-blue);"></i> Supabase 클라우드 동기화</span>
             <span class="chronos-badge badge-mint" id="supabase-status-badge">클라우드 연결됨</span>
           </h4>
-          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Supabase Project URL 및 Publishable Key를 연동하여 실시간 데이터베이스에 동기화합니다.</p>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Supabase Project URL 및 Publishable Key를 연동하여 멀티 디바이스에 실시간 동기화합니다.</p>
           
           <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
             <div>
-              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Project URL</label>
-              <input type="text" id="supabase-url-input" class="chronos-input" value="https://mftamdfgyhtkwqceqmxi.supabase.co" placeholder="https://mftamdfgyhtkwqceqmxi.supabase.co" style="width: 100%; font-size: 0.85rem;">
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Project REST API URL</label>
+              <input type="text" id="supabase-url-input" class="chronos-input" value="https://mftamdfgyhtkwqceqmxi.supabase.co" readonly style="width: 100%; font-size: 0.85rem; opacity: 0.8;">
             </div>
             <div>
-              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Anon Public Key (eyJhbGci...)</label>
-              <input type="password" id="supabase-key-input" class="chronos-input" placeholder="anon public key를 여기에 붙여넣으세요" style="width: 100%; font-size: 0.85rem;">
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Publishable Public Key (Anon Key)</label>
+              <input type="password" id="supabase-key-input" class="chronos-input" value="sb_publishable_K4xUxMTg6UbMVOsDyr2Rxw_3TdDTvMB" style="width: 100%; font-size: 0.85rem;">
             </div>
           </div>
           
-          <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn btn-outline" id="save-supabase-config-btn" style="flex: 1; font-size: 0.88rem; padding: 8px 14px; color: #fff; background: var(--accent-blue); border-color: var(--accent-blue);">
-              <i class="fa-solid fa-plug"></i> 연동 및 저장
-            </button>
-          </div>
+          <button type="button" class="btn btn-outline" id="save-supabase-config-btn" style="width: 100%; font-size: 0.88rem; padding: 8px 14px; color: #fff; background: var(--accent-blue); border-color: var(--accent-blue); cursor: pointer;">
+            <i class="fa-solid fa-plug"></i> 연동 및 저장
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <button type="button" class="btn btn-outline" id="export-json-btn" style="flex: 1; font-size: 0.82rem;">
+            <i class="fa-solid fa-download"></i> JSON 백업 다운로드
+          </button>
+          <button type="button" class="btn btn-outline" id="import-json-btn" style="flex: 1; font-size: 0.82rem;">
+            <i class="fa-solid fa-upload"></i> JSON 복원하기
+          </button>
+          <input type="file" id="import-json-file" accept=".json" style="display: none;">
         </div>
 
         <button type="button" class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; color: var(--accent-mint); border-color: rgba(52, 211, 153, 0.3);">
