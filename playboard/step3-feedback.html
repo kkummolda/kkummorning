@@ -3,18 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>꿈모닝 - 3단계: 일일 피드백 (Daily Feedback)</title>
-  <meta name="description" content="자아·가정·사회·영혼 4대 영역 피드백을 기록하고 Supabase DB에 실시간 저장하는 일일 피드백 독립 프로토타입 페이지입니다.">
+  <title>꿈모닝 - 3단계: 일일 피드백 (Daily Review Prototype & Spec)</title>
+  <meta name="description" content="날짜별 4대 영역 성찰 일기와 한 줄 요약을 작성하고 Supabase Postgres DB(daily_logs)에 실시간 전송 저장하는 3단계 프로토타입 및 기술기획 패널 페이지입니다.">
   <meta name="theme-color" content="#0b0e17">
   <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome & Supabase SDK -->
+  <!-- FontAwesome Icons & Supabase SDK -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <link rel="stylesheet" href="styles.css">
+  <script src="../config.js"></script>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .spec-side-panel {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--accent-blue);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-top: 28px;
+    }
+    .spec-grid-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .spec-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .spec-box h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+    }
+    .spec-box ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
   <canvas id="ambient-canvas"></canvas>
@@ -26,136 +60,160 @@
         <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
           <div class="logo-icon">🌙</div>
           <div class="brand-text">
-            <h1>꿈모닝 <span style="font-size: 0.7rem; color: var(--accent-mint); font-weight: 500;">(Page Prototype 3)</span></h1>
+            <h1>꿈모닝 <span style="font-size: 0.7rem; color: var(--accent-blue); font-weight: 500;">(Step 3 Spec)</span></h1>
           </div>
         </a>
       </div>
 
       <nav class="stepper-nav-header">
-        <a href="index.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard</a>
-        <a href="step1-mindfulness.html" class="nav-link-btn" style="text-decoration: none;">1단계: 마음 보기</a>
-        <a href="step2-values.html" class="nav-link-btn" style="text-decoration: none;">2단계: 가치 생각</a>
-        <a href="step3-feedback.html" class="nav-link-btn active" style="text-decoration: none;">3단계: 일일 피드백</a>
-        <a href="step4-dashboard.html" class="nav-link-btn" style="text-decoration: none;">4단계: 21일 잔디</a>
-        <a href="pages-list.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-list"></i> 목록</a>
+        <a href="index.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard 메인</a>
+        <a href="step1-mindfulness.html" class="nav-link-btn" style="text-decoration: none;">1. 마음 보기</a>
+        <a href="step2-values.html" class="nav-link-btn" style="text-decoration: none;">2. 가치 생각</a>
+        <a href="step3-feedback.html" class="nav-link-btn active" style="text-decoration: none;">3. 일일 피드백</a>
+        <a href="step4-dashboard.html" class="nav-link-btn" style="text-decoration: none;">4. 21일 잔디</a>
       </nav>
 
       <div class="header-status">
-        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
-          <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 가입
-        </button>
-        <div class="user-profile-pill" id="header-user-profile" style="display: none; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
-          <i class="fa-solid fa-circle-user"></i> <span id="header-user-name">Dreamer</span>
-          <i class="fa-solid fa-right-from-bracket" id="header-logout-icon" title="로그아웃" style="margin-left: 4px; opacity: 0.7;"></i>
-        </div>
+        <a href="auth.html" class="btn btn-outline btn-sm" style="text-decoration: none; padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue);">
+          <i class="fa-solid fa-user-shield"></i> 인증/설정
+        </a>
       </div>
     </header>
 
-    <main class="main-content" style="margin-top: 20px;">
-      <!-- STEP 3: 일일 피드백 -->
-      <section class="step-view active" id="view-step-3">
-        <div class="chronos-banner-card">
-          <div class="step-badge">3단계: 일일 피드백 (Daily 4-Area Review)</div>
-          <h2 class="chronos-banner-title">오늘 하루, 4가지 영역에서 일어난 일을 피드백해보세요</h2>
-          <p class="chronos-banner-desc">잘한 점, 아쉬운 점, 다음엔 어떻게 개선할지 진솔하게 적어보세요.</p>
+    <main class="main-content" style="margin-top: 24px;">
+      <!-- MOCKUP UI SECTION -->
+      <div class="chronos-banner-card">
+        <div class="step-badge">3단계: 일일 피드백 (Daily 4-Area Review Mockup)</div>
+        <h2 class="chronos-banner-title">오늘 하루, 4가지 영역에서 일어난 일을 피드백해보세요</h2>
+        <p class="chronos-banner-desc">잘한 점, 아쉬운 점, 다음엔 어떻게 개선할지 진솔하게 적어보세요.</p>
 
-          <form id="feedback-entry-form" onsubmit="return false;">
-            <div class="feedback-date-picker-row">
-              <div class="date-input-wrapper">
-                <label for="feedback-date-picker"><i class="fa-regular fa-calendar-days"></i> 기록 날짜 선택:</label>
-                <input type="date" id="feedback-date-picker" class="chronos-date-input">
+        <form id="feedback-entry-form" onsubmit="return false;">
+          <div class="feedback-date-picker-row">
+            <div class="date-input-wrapper">
+              <label for="feedback-date-picker"><i class="fa-regular fa-calendar-days"></i> 기록 날짜 선택:</label>
+              <input type="date" id="feedback-date-picker" class="chronos-date-input">
+            </div>
+            <div class="day-tracker-chip" id="feedback-day-chip">
+              <span>Day 1 / 21 기록 중</span>
+            </div>
+          </div>
+
+          <!-- 4 Areas Accordion / Grid Form -->
+          <div class="feedback-quad-grid">
+            <div class="feedback-field-card card-border-mint">
+              <div class="field-header">
+                <div class="field-icon-title">
+                  <span class="area-icon">🌱</span>
+                  <div>
+                    <h4 class="area-title">자아 (Self) 피드백</h4>
+                  </div>
+                </div>
+                <span class="chronos-badge badge-mint">REQUIRED</span>
               </div>
-              <div class="day-tracker-chip" id="feedback-day-chip">
-                <span>Day 1 / 21 기록 중</span>
-              </div>
+              <textarea id="feedback-self" class="chronos-textarea" rows="3" placeholder="오늘 나 자신을 위해 행동한 것, 생각의 성찰을 적어보세요."></textarea>
             </div>
 
-            <!-- 4 Areas Accordion / Grid Form -->
-            <div class="feedback-quad-grid">
-              <!-- Area 1: Self -->
-              <div class="feedback-field-card card-border-mint">
-                <div class="field-header">
-                  <div class="field-icon-title">
-                    <span class="area-icon">🌱</span>
-                    <div>
-                      <h4 class="area-title">자아 (Self) 피드백</h4>
-                      <p class="area-goal-sub" id="form-sub-self">목표: 매일 30분 독서 및 온전한 생각 정리</p>
-                    </div>
+            <div class="feedback-field-card card-border-coral">
+              <div class="field-header">
+                <div class="field-icon-title">
+                  <span class="area-icon">🏡</span>
+                  <div>
+                    <h4 class="area-title">가정 (Family) 피드백</h4>
                   </div>
-                  <span class="chronos-badge badge-mint">REQUIRED</span>
                 </div>
-                <textarea id="feedback-self" class="chronos-textarea" rows="3" placeholder="오늘 나 자신을 위해 행동한 것, 생각의 성찰을 적어보세요."></textarea>
+                <span class="chronos-badge badge-coral">PRIMARY</span>
               </div>
-
-              <!-- Area 2: Family -->
-              <div class="feedback-field-card card-border-coral">
-                <div class="field-header">
-                  <div class="field-icon-title">
-                    <span class="area-icon">🏡</span>
-                    <div>
-                      <h4 class="area-title">가정 (Family) 피드백</h4>
-                      <p class="area-goal-sub" id="form-sub-family">목표: 가족과 따뜻한 저녁 식사와 깊은 경청</p>
-                    </div>
-                  </div>
-                  <span class="chronos-badge badge-coral">PRIMARY</span>
-                </div>
-                <textarea id="feedback-family" class="chronos-textarea" rows="3" placeholder="가족에게 한 따뜻한 말 한마디나 함께한 순간을 기록하세요."></textarea>
-              </div>
-
-              <!-- Area 3: Society -->
-              <div class="feedback-field-card card-border-blue">
-                <div class="field-header">
-                  <div class="field-icon-title">
-                    <span class="area-icon">🏢</span>
-                    <div>
-                      <h4 class="area-title">사회 (Society) 피드백</h4>
-                      <p class="area-goal-sub" id="form-sub-society">목표: 동료의 이야기를 먼저 끝까지 경청하기</p>
-                    </div>
-                  </div>
-                  <span class="chronos-badge badge-blue">FOCUS</span>
-                </div>
-                <textarea id="feedback-society" class="chronos-textarea" rows="3" placeholder="일터나 공동체에서 타인에게 기여하거나 배운 점을 적어보세요."></textarea>
-              </div>
-
-              <!-- Area 4: Soul -->
-              <div class="feedback-field-card card-border-purple">
-                <div class="field-header">
-                  <div class="field-icon-title">
-                    <span class="area-icon">✨</span>
-                    <div>
-                      <h4 class="area-title">영혼 (Soul) 피드백</h4>
-                      <p class="area-goal-sub" id="form-sub-soul">목표: 하루 5분 호흡과 명상으로 평온 지키기</p>
-                    </div>
-                  </div>
-                  <span class="chronos-badge badge-mint">INNER</span>
-                </div>
-                <textarea id="feedback-soul" class="chronos-textarea" rows="3" placeholder="내면의 감정, 감사한 일, 온전한 평온의 순간을 남겨보세요."></textarea>
-              </div>
+              <textarea id="feedback-family" class="chronos-textarea" rows="3" placeholder="가족에게 한 따뜻한 말 한마디나 함께한 순간을 기록하세요."></textarea>
             </div>
 
-            <div class="summary-field-wrapper" style="margin-top: 16px;">
-              <label for="feedback-summary"><i class="fa-solid fa-quote-left"></i> 오늘 하루 한 줄 요약 (Today's Key Takeaway)</label>
-              <input type="text" id="feedback-summary" class="chronos-input" placeholder="예: 경청은 상대를 향한 최고의 존중이다." style="width: 100%;">
+            <div class="feedback-field-card card-border-blue">
+              <div class="field-header">
+                <div class="field-icon-title">
+                  <span class="area-icon">🏢</span>
+                  <div>
+                    <h4 class="area-title">사회 (Society) 피드백</h4>
+                  </div>
+                </div>
+                <span class="chronos-badge badge-blue">FOCUS</span>
+              </div>
+              <textarea id="feedback-society" class="chronos-textarea" rows="3" placeholder="일터나 공동체에서 타인에게 기여하거나 배운 점을 적어보세요."></textarea>
             </div>
 
-            <div class="step-footer-actions" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center;">
-              <a href="step2-values.html" class="btn btn-outline" style="text-decoration: none;">
-                <i class="fa-solid fa-chevron-left"></i> 이전: 2단계 가치 생각
-              </a>
-              <button type="button" class="btn btn-engage btn-glow" id="save-daily-log-btn">
-                <i class="fa-solid fa-cloud-arrow-up"></i> 오늘 일기 Supabase 저장하기
-              </button>
-              <a href="step4-dashboard.html" class="btn btn-primary" style="text-decoration: none;">
-                다음: 21일 잔디 달성도 보기 <i class="fa-solid fa-arrow-right"></i>
-              </a>
+            <div class="feedback-field-card card-border-purple">
+              <div class="field-header">
+                <div class="field-icon-title">
+                  <span class="area-icon">✨</span>
+                  <div>
+                    <h4 class="area-title">영혼 (Soul) 피드백</h4>
+                  </div>
+                </div>
+                <span class="chronos-badge badge-mint">INNER</span>
+              </div>
+              <textarea id="feedback-soul" class="chronos-textarea" rows="3" placeholder="내면의 감정, 감사한 일, 온전한 평온의 순간을 남겨보세요."></textarea>
             </div>
-          </form>
+          </div>
+
+          <div class="summary-field-wrapper" style="margin-top: 16px;">
+            <label for="feedback-summary"><i class="fa-solid fa-quote-left"></i> 오늘 하루 한 줄 요약 (Today's Key Takeaway)</label>
+            <input type="text" id="feedback-summary" class="chronos-input" placeholder="예: 경청은 상대를 향한 최고의 존중이다." style="width: 100%;">
+          </div>
+
+          <div class="step-footer-actions" style="margin-top: 24px; display: flex; justify-content: space-between;">
+            <a href="step2-values.html" class="btn btn-outline" style="text-decoration: none;">
+              <i class="fa-solid fa-arrow-left"></i> 이전: 2단계 가치 생각
+            </a>
+            <button type="button" class="btn btn-engage btn-glow" id="save-daily-log-btn">
+              <i class="fa-solid fa-cloud-arrow-up"></i> 오늘 일기 Supabase 저장하기
+            </button>
+            <a href="step4-dashboard.html" class="btn btn-primary" style="text-decoration: none;">
+              다음: 21일 잔디 달성도 보기 <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- TECHNICAL SPEC PANEL -->
+      <section class="spec-side-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin: 0;">
+            <i class="fa-solid fa-microchip" style="color: var(--accent-blue);"></i> 3단계 기술기획 패널 (Technical Spec Panel)
+          </h3>
+          <span class="chronos-badge badge-blue">시각화된 기술기획서 본체</span>
+        </div>
+
+        <div class="spec-grid-row">
+          <div class="spec-box">
+            <h4>📌 요구사항 (PRD-03)</h4>
+            <ul>
+              <li>자아·가정·사회·영혼 4대 영역 피드백 및 한 줄 요약 입력</li>
+              <li>날짜 선택 시 해당 일자의 기존 일기 자동 불러오기 (Read)</li>
+              <li>Supabase Postgres DB (`daily_logs`) 실시간 Upsert (Create/Update)</li>
+            </ul>
+          </div>
+
+          <div class="spec-box">
+            <h4>🛡️ 데이터 계약 (CON-03)</h4>
+            <ul>
+              <li>Table: public.daily_logs</li>
+              <li>Composite Unique Constraint: UNIQUE(user_id, date)</li>
+              <li>Payload: { user_id, day, date, self_feedback, family_feedback, society_feedback, soul_feedback, one_sentence_summary }</li>
+            </ul>
+          </div>
+
+          <div class="spec-box">
+            <h4>⚡ 오프라인/복구 엔진 (DOM-INTEGRITY)</h4>
+            <ul>
+              <li>LocalStorage 1차 즉시 저장 (네트워크 단절 대처)</li>
+              <li>Supabase 연결 시 백그라운드 롤업 업로드</li>
+              <li>Toast 알림 z-index: 4000 보장</li>
+            </ul>
+          </div>
         </div>
       </section>
     </main>
   </div>
 
   <div id="toast-container"></div>
-  <script src="app.js"></script>
+  <script src="../app.js"></script>
 </body>
 </html>

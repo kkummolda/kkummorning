@@ -1,0 +1,180 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "project_info": {
+    "title": "꿈모닝 (Dream Morning) 21일 챌린지 PlayBoard",
+    "version": "1.0.0-PROD-SoT",
+    "last_updated": "2026-08-19",
+    "server": "http://localhost:8080",
+    "database": "Supabase PostgreSQL (mftamdfgyhtkwqceqmxi)",
+    "security": "Row Level Security (RLS) Active"
+  },
+  "domains": [
+    {
+      "id": "DOM-AUTH",
+      "name": "인증·세션 (Auth & Session)",
+      "description": "Supabase Auth JWT 세션 발행, Auto Sign-In Fallback 및 세션 갱신 관리"
+    },
+    {
+      "id": "DOM-ACCESS",
+      "name": "접근 제어 (RLS Access Control)",
+      "description": "PostgreSQL Row Level Security (RLS) 정책을 통한 유저별 멀티테넌트 데이터 격리"
+    },
+    {
+      "id": "DOM-INTEGRITY",
+      "name": "데이터 무결성·백업 (Data Integrity & Storage)",
+      "description": "LocalStorage 1차 저장 및 Supabase Postgres 2차 Upsert 이중 동기화"
+    },
+    {
+      "id": "DOM-DR",
+      "name": "장애·복구 (Disaster Recovery & Retry)",
+      "description": "네트워크 연결 재시도, Exponential Backoff 및 Rate Limit 예외 처리"
+    },
+    {
+      "id": "DOM-OBSERVABILITY",
+      "name": "관측성 (Observability & Logging)",
+      "description": "전역 에러 인터셉터, 콘솔 로거 및 사용자 피드백 토스트 통제"
+    },
+    {
+      "id": "DOM-PERF",
+      "name": "성능·캐시 (Performance & Audio Buffer)",
+      "description": "Web Audio API 신디사이저 메모리 관리 및 60fps Ambient Canvas 최적화"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "NODE-01",
+      "name": "1단계: 마음 보기 (Mindfulness)",
+      "url": "/playboard/step1-mindfulness.html",
+      "owner": "Frontend & Audio Engineer",
+      "coverage": {
+        "DOM-AUTH": "PARTIAL",
+        "DOM-ACCESS": "NA",
+        "DOM-INTEGRITY": "FULL",
+        "DOM-DR": "FULL",
+        "DOM-OBSERVABILITY": "FULL",
+        "DOM-PERF": "FULL"
+      }
+    },
+    {
+      "id": "NODE-02",
+      "name": "2단계: 가치 생각 (One Word)",
+      "url": "/playboard/step2-values.html",
+      "owner": "UX & State Engineer",
+      "coverage": {
+        "DOM-AUTH": "FULL",
+        "DOM-ACCESS": "FULL",
+        "DOM-INTEGRITY": "FULL",
+        "DOM-DR": "FULL",
+        "DOM-OBSERVABILITY": "FULL",
+        "DOM-PERF": "FULL"
+      }
+    },
+    {
+      "id": "NODE-03",
+      "name": "3단계: 일일 피드백 (Daily Review)",
+      "url": "/playboard/step3-feedback.html",
+      "owner": "Fullstack Data Engineer",
+      "coverage": {
+        "DOM-AUTH": "FULL",
+        "DOM-ACCESS": "FULL",
+        "DOM-INTEGRITY": "FULL",
+        "DOM-DR": "FULL",
+        "DOM-OBSERVABILITY": "FULL",
+        "DOM-PERF": "FULL"
+      }
+    },
+    {
+      "id": "NODE-04",
+      "name": "4단계: 21일 잔디 (Dashboard)",
+      "url": "/playboard/step4-dashboard.html",
+      "owner": "Data Visualization Engineer",
+      "coverage": {
+        "DOM-AUTH": "FULL",
+        "DOM-ACCESS": "FULL",
+        "DOM-INTEGRITY": "FULL",
+        "DOM-DR": "FULL",
+        "DOM-OBSERVABILITY": "FULL",
+        "DOM-PERF": "FULL"
+      }
+    },
+    {
+      "id": "NODE-05",
+      "name": "인증 & 클라우드 설정 (Auth & Cloud)",
+      "url": "/playboard/auth.html",
+      "owner": "Security & Infra Engineer",
+      "coverage": {
+        "DOM-AUTH": "FULL",
+        "DOM-ACCESS": "FULL",
+        "DOM-INTEGRITY": "FULL",
+        "DOM-DR": "FULL",
+        "DOM-OBSERVABILITY": "FULL",
+        "DOM-PERF": "FULL"
+      }
+    }
+  ],
+  "contracts": [
+    {
+      "id": "CON-01",
+      "source": "NODE-05",
+      "target": "NODE-01",
+      "payload": "{ user_id: UUID, session: JWT, user_name: String }",
+      "rule": "Auth Session 발급 즉시 state.user_profile 저장 및 1단계로 전환"
+    },
+    {
+      "id": "CON-02",
+      "source": "NODE-02",
+      "target": "public.user_profiles",
+      "payload": "{ user_id, oneword, oneword_quote, goal_self, goal_family, goal_society, goal_soul }",
+      "rule": "Supabase user_profiles 테이블에 Upsert (onConflict: user_id)"
+    },
+    {
+      "id": "CON-03",
+      "source": "NODE-03",
+      "target": "public.daily_logs",
+      "payload": "{ user_id, day, date, self_feedback, family_feedback, society_feedback, soul_feedback, one_sentence_summary }",
+      "rule": "Supabase daily_logs 테이블에 Upsert (onConflict: user_id, date)"
+    }
+  ],
+  "gates": [
+    {
+      "id": "GATE-01",
+      "name": "Z-Index Layer Security Gate",
+      "criteria": "#toast-container (z-index 4000) > #global-loading (3000) > .modal-overlay (2500)",
+      "status": "PASSED"
+    },
+    {
+      "id": "GATE-02",
+      "name": "Duplicate User Fallback Gate",
+      "criteria": "signUp() 400/already registered 발생 시 signInWithPassword() 자동 승계",
+      "status": "PASSED"
+    },
+    {
+      "id": "GATE-03",
+      "name": "UUID Masking Gate",
+      "criteria": "isUUID() 정규식 검출 시 raw UUID 표시 금지 및 닉네임/이메일 대체 표시",
+      "status": "PASSED"
+    }
+  ],
+  "nfr": [
+    {
+      "id": "NFR-01",
+      "name": "Mobile Safari Auto-Zoom Prevention",
+      "specification": "모든 input/textarea font-size >= 16px 및 viewport-fit=cover 적용"
+    },
+    {
+      "id": "NFR-02",
+      "name": "Audio Context Garbage Collection",
+      "specification": "탭 이동 또는 타이머 종료 시 AudioContext.close()로 메모리 누수 방지"
+    }
+  ],
+  "issues_dag": [
+    { "id": "ISS-01", "name": "Supabase Auth & RLS Schema Integration", "status": "COMPLETED", "parents": [] },
+    { "id": "ISS-02", "name": "Mobile Touch & Form Auto-Zoom Fix", "status": "COMPLETED", "parents": ["ISS-01"] },
+    { "id": "ISS-03", "name": "SyntaxError Boot Crash Removal", "status": "COMPLETED", "parents": ["ISS-01"] },
+    { "id": "ISS-04", "name": "Toast Z-Index Elevation", "status": "COMPLETED", "parents": ["ISS-02"] },
+    { "id": "ISS-05", "name": "Existing User Auto Sign-in Fallback", "status": "COMPLETED", "parents": ["ISS-01"] },
+    { "id": "ISS-06", "name": "Header Username UUID Masking", "status": "COMPLETED", "parents": ["ISS-05"] },
+    { "id": "ISS-07", "name": "New /playboard Live Route & SoT Architecture", "status": "COMPLETED", "parents": ["ISS-01", "ISS-06"] },
+    { "id": "ISS-08", "name": "Phase A~D PlayBoard SoT Matrix & Mermaid DAG Engine", "status": "COMPLETED", "parents": ["ISS-07"] }
+  ]
+}
