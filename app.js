@@ -1193,13 +1193,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (authBtn) authBtn.style.display = 'none';
       if (profilePill) profilePill.style.display = 'inline-flex';
 
-      const displayName = user.user_metadata?.user_name || state.user_profile.user_name || user.email?.split('@')[0] || 'Dreamer';
+      const displayName = state.user_profile.user_name || user.user_metadata?.user_name || user.email?.split('@')[0] || 'Dreamer';
       if (headerUserName) headerUserName.textContent = displayName;
-      document.getElementById('display-user-id').textContent = displayName;
+      const displayUserId = document.getElementById('display-user-id');
+      if (displayUserId) displayUserId.textContent = displayName;
     } else {
       if (authBtn) authBtn.style.display = 'inline-flex';
       if (profilePill) profilePill.style.display = 'none';
-      document.getElementById('display-user-id').textContent = 'Guest (로그인 필요)';
+      const displayUserId = document.getElementById('display-user-id');
+      if (displayUserId) displayUserId.textContent = 'Guest (로그인 필요)';
     }
   }
 
@@ -1397,6 +1399,9 @@ document.addEventListener('DOMContentLoaded', () => {
         state.user_profile.four_area_goals.soul = profile.goal_soul || state.user_profile.four_area_goals.soul;
         if (profile.sound_type) state.sound_settings.sound_type = profile.sound_type;
         if (profile.volume !== null && profile.volume !== undefined) state.sound_settings.volume = profile.volume;
+        
+        updateAuthUI(currentUser);
+        updateUI();
       }
 
       // 2. Fetch daily_logs
