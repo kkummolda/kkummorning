@@ -1184,6 +1184,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function isUUID(str) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str).trim());
+  }
+
   function updateAuthUI(user) {
     const authBtn = document.getElementById('open-auth-modal-btn');
     const profilePill = document.getElementById('header-user-profile');
@@ -1193,7 +1197,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (authBtn) authBtn.style.display = 'none';
       if (profilePill) profilePill.style.display = 'inline-flex';
 
-      const displayName = state.user_profile.user_name || user.user_metadata?.user_name || user.email?.split('@')[0] || 'Dreamer';
+      let displayName = state.user_profile.user_name;
+      if (!displayName || isUUID(displayName)) {
+        displayName = user.user_metadata?.user_name;
+      }
+      if (!displayName || isUUID(displayName)) {
+        displayName = user.email?.split('@')[0] || '꿈모닝 회원';
+      }
+
       if (headerUserName) headerUserName.textContent = displayName;
       const displayUserId = document.getElementById('display-user-id');
       if (displayUserId) displayUserId.textContent = displayName;
