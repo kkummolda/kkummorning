@@ -1583,23 +1583,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  window.submitAuthForm = function() {
+    const email = document.getElementById('auth-email-input').value.trim();
+    const password = document.getElementById('auth-password-input').value.trim();
+    const name = document.getElementById('auth-name-input')?.value.trim();
+
+    if (!email || !password) {
+      showToast('이메일과 비밀번호(6자 이상)를 입력해 주세요.', 'error');
+      return;
+    }
+
+    if (activeAuthTab === 'signin') {
+      handleSignIn(email, password);
+    } else {
+      handleSignUp(email, password, name);
+    }
+  };
+
   if (submitBtn) {
-    submitBtn.addEventListener('click', () => {
-      const email = document.getElementById('auth-email-input').value.trim();
-      const password = document.getElementById('auth-password-input').value.trim();
-      const name = document.getElementById('auth-name-input')?.value.trim();
-
-      if (!email || !password) {
-        showToast('이메일과 비밀번호를 입력해 주세요.', 'error');
-        return;
-      }
-
-      if (activeAuthTab === 'signin') {
-        handleSignIn(email, password);
-      } else {
-        handleSignUp(email, password, name);
-      }
-    });
+    submitBtn.addEventListener('click', window.submitAuthForm);
   }
 
   const logoutIcon = document.getElementById('header-logout-icon');

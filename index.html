@@ -632,7 +632,7 @@
           <button class="btn btn-outline" id="tab-signup" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">회원가입</button>
         </div>
 
-        <form id="auth-form" onsubmit="return false;">
+        <form id="auth-form" onsubmit="window.submitAuthForm(); return false;">
           <div id="signup-name-group" style="display: none; margin-bottom: 12px;">
             <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">성함 / 닉네임</label>
             <input type="text" id="auth-name-input" class="chronos-input" placeholder="홍길동" style="width: 100%;">
@@ -648,7 +648,7 @@
             <input type="password" id="auth-password-input" class="chronos-input" placeholder="••••••••" required minlength="6" style="width: 100%;">
           </div>
 
-          <button class="btn btn-engage" id="auth-submit-btn" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+          <button type="button" class="btn btn-engage" id="auth-submit-btn" onclick="window.submitAuthForm()" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem; cursor: pointer;">
             <i class="fa-solid fa-right-to-bracket"></i> 로그인
           </button>
         </form>
