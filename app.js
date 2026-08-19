@@ -1352,7 +1352,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Sign up error:', err);
-      showToast(`가입/로그인 안내: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
+      showToast(`가입/로그인 안내: ${formatAuthErrorMessage(err.message)}`, 'error');
     } finally {
       hideGlobalLoading();
     }
