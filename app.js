@@ -1062,7 +1062,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let supabaseClient = null;
   let currentSession = null;
   let currentUser = null;
-  let activeAuthTab = 'signin'; // 'signin' or 'signup'
+  let activeAuthTab = 'signup'; // Default to 'signup'
+
+  window.submitAuthForm = function() {
+    const email = document.getElementById('auth-email-input').value.trim();
+    const password = document.getElementById('auth-password-input').value.trim();
+    const name = document.getElementById('auth-name-input')?.value.trim();
+
+    if (!email || !password) {
+      showToast('이메일과 비밀번호(6자 이상)를 입력해 주세요.', 'error');
+      return;
+    }
+
+    const nameGroup = document.getElementById('signup-name-group');
+    const isSignupVisible = nameGroup && (nameGroup.style.display === 'block' || nameGroup.style.display === '');
+
+    if (activeAuthTab === 'signup' || isSignupVisible) {
+      handleSignUp(email, password, name);
+    } else {
+      handleSignIn(email, password);
+    }
+  };
 
   function updateSupabaseUI(isConnected) {
     const badge = document.getElementById('supabase-status-badge');
