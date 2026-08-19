@@ -118,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('데이터 저장 중 오류가 발생했습니다.', 'error');
     }
   }
+  const saveStateToLocalStorage = saveState;
 
   // ------------------------------------------------------------------------
   // 2. BACKGROUND AMBIENT PARTICLES CANVAS
@@ -155,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     draw() {
-      ctx.fillStyle = `rgba(192, 132, 252, ${this.opacity})`;
+      ctx.fillStyle = `rgba(1, 35, 180, ${this.opacity})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
@@ -617,10 +618,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function updateCharCounters() {
-    document.getElementById('counter-self').textContent = `${selfInput.value.length}자`;
-    document.getElementById('counter-family').textContent = `${familyInput.value.length}자`;
-    document.getElementById('counter-society').textContent = `${societyInput.value.length}자`;
-    document.getElementById('counter-soul').textContent = `${soulInput.value.length}자`;
+    const counterSelf = document.getElementById('counter-self');
+    const counterFamily = document.getElementById('counter-family');
+    const counterSociety = document.getElementById('counter-society');
+    const counterSoul = document.getElementById('counter-soul');
+    if (counterSelf) counterSelf.textContent = `${selfInput.value.length}자`;
+    if (counterFamily) counterFamily.textContent = `${familyInput.value.length}자`;
+    if (counterSociety) counterSociety.textContent = `${societyInput.value.length}자`;
+    if (counterSoul) counterSoul.textContent = `${soulInput.value.length}자`;
   }
 
   [selfInput, familyInput, societyInput, soulInput].forEach(el => {
@@ -662,6 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let autosaveTimer = null;
   function triggerAutosaveIndicator() {
     const indicator = document.getElementById('autosave-indicator');
+    if (!indicator) return;
     indicator.style.color = '#c084fc';
     indicator.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> 입력 중...';
 
@@ -908,11 +914,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // ------------------------------------------------------------------------
   const reflectionModal = document.getElementById('comprehensive-reflection-modal');
 
-  document.getElementById('view-comprehensive-reflection-btn').addEventListener('click', () => {
-    openComprehensiveReflectionModal();
-  });
+  const viewReflectionBtn = document.getElementById('view-comprehensive-reflection-btn');
+  if (viewReflectionBtn) {
+    viewReflectionBtn.addEventListener('click', () => {
+      openComprehensiveReflectionModal();
+    });
+  }
 
   function openComprehensiveReflectionModal() {
+    if (!reflectionModal) return;
     document.getElementById('reflection-user-title').textContent = `${state.user_profile.user_id} 님의 21일 성찰 종합 리포트`;
 
     // Aggregate feedback text per area
@@ -944,16 +954,19 @@ document.addEventListener('DOMContentLoaded', () => {
     reflectionModal.classList.add('active');
   }
 
-  document.getElementById('close-reflection-modal').addEventListener('click', () => {
-    reflectionModal.classList.remove('active');
-  });
-  document.getElementById('close-reflection-modal-btn').addEventListener('click', () => {
-    reflectionModal.classList.remove('active');
-  });
+  const closeReflectionModalBtn = document.getElementById('close-reflection-modal');
+  if (closeReflectionModalBtn) {
+    closeReflectionModalBtn.addEventListener('click', () => reflectionModal.classList.remove('active'));
+  }
+  const closeReflectionModalBtn2 = document.getElementById('close-reflection-modal-btn');
+  if (closeReflectionModalBtn2) {
+    closeReflectionModalBtn2.addEventListener('click', () => reflectionModal.classList.remove('active'));
+  }
 
-  document.getElementById('print-reflection-btn').addEventListener('click', () => {
-    window.print();
-  });
+  const printReflectionBtn = document.getElementById('print-reflection-btn');
+  if (printReflectionBtn) {
+    printReflectionBtn.addEventListener('click', () => window.print());
+  }
 
   // ------------------------------------------------------------------------
   // 10. BACKUP & RESTORE MODAL
@@ -1019,25 +1032,31 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Load Sample (Virtual) Data
-  document.getElementById('load-sample-data-btn').addEventListener('click', () => {
-    if (confirm('샘플(가상) 데이터를 불러오시겠습니까? 체험용 일지와 프로필이 생성됩니다.')) {
-      state = getSampleState();
-      saveState();
-      backupModal.classList.remove('active');
-      showToast('샘플 데이터가 로드되었습니다! ✨', 'info');
-    }
-  });
+  const loadSampleDataBtn = document.getElementById('load-sample-data-btn');
+  if (loadSampleDataBtn) {
+    loadSampleDataBtn.addEventListener('click', () => {
+      if (confirm('샘플(가상) 데이터를 불러오시겠습니까? 체험용 일지와 프로필이 생성됩니다.')) {
+        state = getSampleState();
+        saveState();
+        backupModal.classList.remove('active');
+        showToast('샘플 데이터가 로드되었습니다! ✨', 'info');
+      }
+    });
+  }
 
   // Reset All Data
-  document.getElementById('reset-all-data-btn').addEventListener('click', () => {
-    if (confirm('정말로 모든 피드백 기록 및 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      localStorage.removeItem(STORAGE_KEY);
-      state = createDefaultState();
-      saveStateToLocalStorage();
-      backupModal.classList.remove('active');
-      showToast('모든 데이터가 초기화되었습니다.', 'info');
-    }
-  });
+  const resetAllDataBtn = document.getElementById('reset-all-data-btn');
+  if (resetAllDataBtn) {
+    resetAllDataBtn.addEventListener('click', () => {
+      if (confirm('정말로 모든 피드백 기록 및 설정을 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+        localStorage.removeItem(STORAGE_KEY);
+        state = createDefaultState();
+        saveStateToLocalStorage();
+        backupModal.classList.remove('active');
+        showToast('모든 데이터가 초기화되었습니다.', 'info');
+      }
+    });
+  }
 
   // Handle First-Time User Welcome Modal
   const welcomeModal = document.getElementById('user-welcome-modal');
@@ -1754,7 +1773,7 @@ document.addEventListener('DOMContentLoaded', () => {
       p.style.top = '-10px';
       p.style.width = '10px';
       p.style.height = '10px';
-      p.style.backgroundColor = ['#10b981', '#6366f1', '#ec4899', '#fbbf24'][Math.floor(Math.random() * 4)];
+      p.style.backgroundColor = ['#0123b4', '#16a866', '#ff5a5f', '#fbbf24'][Math.floor(Math.random() * 4)];
       p.style.zIndex = '9999';
       p.style.borderRadius = '50%';
       p.style.pointerEvents = 'none';

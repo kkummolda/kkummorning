@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>꿈모닝 - 매일 밤 5분, 나다운 삶을 가꾸는 21일 회고</title>
-  <meta name="description" content="매일 밤 자기 전 5분, 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 서비스입니다.">
-  <meta name="theme-color" content="#0b0e17">
+  <title>꿈모닝 - 진짜 나를 만나는 시간, 자기 전 5분</title>
+  <meta name="description" content="진짜 나를 만나는 시간, 자기 전 5분. 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 서비스입니다.">
+  <meta name="theme-color" content="#f4f6fc">
+  <link rel="icon" type="image/png" href="favicon.png">
   <!-- Mobile Smartphone & PWA Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="꿈모닝">
+  <link rel="apple-touch-icon" href="favicon.png">
   <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,9 +32,10 @@
     <header class="app-header">
       <div class="header-brand">
         <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
-          <div class="logo-icon">🌙</div>
+          <img class="logo-icon" src="assets/moldy/moldy-idle.png" alt="몰디">
           <div class="brand-text">
             <h1>꿈모닝</h1>
+            <span class="brand-tagline">진짜 나를 만나는 시간, 자기 전 5분</span>
           </div>
         </a>
       </div>
@@ -50,7 +53,7 @@
         <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 5px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
           <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 가입
         </button>
-        <div class="user-profile-pill" id="header-user-profile" title="프로필 관리 및 로그아웃" style="display: none; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
+        <div class="user-profile-pill" id="header-user-profile" title="프로필 관리 및 로그아웃" style="display: none; align-items: center; gap: 6px; background: var(--bg-card-secondary); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
           <i class="fa-solid fa-circle-user"></i> <span id="header-user-name">Dreamer</span>
           <i class="fa-solid fa-right-from-bracket" id="header-logout-icon" title="로그아웃" style="margin-left: 4px; opacity: 0.7;"></i>
         </div>
@@ -66,7 +69,7 @@
         <button class="icon-btn backup-btn" id="open-backup-btn" title="설정">
           <i class="fa-solid fa-gear"></i>
         </button>
-        <a href="playboard/index.html" class="btn btn-outline btn-sm" style="text-decoration: none; padding: 4px 10px; font-size: 0.78rem; color: var(--accent-mint); border-color: rgba(52, 211, 153, 0.4);" title="관리자/개발용 상황판 이동">
+        <a href="playboard/index.html" class="btn btn-outline btn-sm" style="text-decoration: none; padding: 4px 10px; font-size: 0.78rem; color: var(--text-muted); border-color: var(--border-hairline);" title="관리자/개발용 상황판 이동">
           <i class="fa-solid fa-gauge"></i> 관제 Playboard
         </a>
       </div>
@@ -89,9 +92,14 @@
       <!-- STEP 1: 마음 보기 -->
       <section class="step-view active" id="view-step-1">
         <div class="chronos-banner-card">
-          <div class="step-badge">1단계: 마음 보기 (Mindfulness)</div>
-          <h2 class="chronos-banner-title">오늘 하루의 소음을 끄고, 차분하게 마음을 가다듬으세요</h2>
-          <p class="chronos-banner-desc">조용한 백색소음이나 힐링 오르골 톤을 틀어두고 깊은 호흡을 3회 진행해보세요.</p>
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div>
+              <div class="step-badge">1단계: 마음 보기 (Mindfulness)</div>
+              <h2 class="chronos-banner-title">오늘 하루의 소음을 끄고, 차분하게 마음을 가다듬으세요</h2>
+              <p class="chronos-banner-desc">조용한 백색소음이나 힐링 오르골 톤을 틀어두고 깊은 호흡을 3회 진행해보세요.</p>
+            </div>
+            <img src="assets/moldy/moldy-focus.png" alt="몰디" class="mascot-companion-img">
+          </div>
 
           <div class="timer-ambient-grid">
             <!-- Timer Circle -->
@@ -255,11 +263,11 @@
           <form id="feedback-entry-form" onsubmit="return false;">
             <div class="feedback-date-picker-row">
               <div class="date-input-wrapper">
-                <label for="feedback-date-picker"><i class="fa-regular fa-calendar-days"></i> 기록 날짜 선택:</label>
-                <input type="date" id="feedback-date-picker" class="chronos-date-input">
+                <label for="feedback-date"><i class="fa-regular fa-calendar-days"></i> 기록 날짜 선택:</label>
+                <input type="date" id="feedback-date" class="chronos-date-input">
               </div>
               <div class="day-tracker-chip" id="feedback-day-chip">
-                <span>Day 1 / 21 기록 중</span>
+                <span id="selected-day-badge">Day 1 / 21 기록 중</span>
               </div>
             </div>
 
@@ -276,7 +284,7 @@
                   </div>
                   <span class="chronos-badge badge-mint">REQUIRED</span>
                 </div>
-                <textarea id="feedback-self" class="chronos-textarea" rows="3" placeholder="오늘 나 자신을 위해 행동한 것, 생각의 성찰을 적어보세요."></textarea>
+                <textarea id="self-feedback" class="chronos-textarea" rows="3" placeholder="오늘 나 자신을 위해 행동한 것, 생각의 성찰을 적어보세요."></textarea>
               </div>
 
               <div class="feedback-field-card card-border-coral">
@@ -290,7 +298,7 @@
                   </div>
                   <span class="chronos-badge badge-coral">PRIMARY</span>
                 </div>
-                <textarea id="feedback-family" class="chronos-textarea" rows="3" placeholder="가족에게 한 따뜻한 말 한마디나 함께한 순간을 기록하세요."></textarea>
+                <textarea id="family-feedback" class="chronos-textarea" rows="3" placeholder="가족에게 한 따뜻한 말 한마디나 함께한 순간을 기록하세요."></textarea>
               </div>
 
               <div class="feedback-field-card card-border-blue">
@@ -304,7 +312,7 @@
                   </div>
                   <span class="chronos-badge badge-blue">FOCUS</span>
                 </div>
-                <textarea id="feedback-society" class="chronos-textarea" rows="3" placeholder="일터나 공동체에서 타인에게 기여하거나 배운 점을 적어보세요."></textarea>
+                <textarea id="society-feedback" class="chronos-textarea" rows="3" placeholder="일터나 공동체에서 타인에게 기여하거나 배운 점을 적어보세요."></textarea>
               </div>
 
               <div class="feedback-field-card card-border-purple">
@@ -318,13 +326,14 @@
                   </div>
                   <span class="chronos-badge badge-mint">INNER</span>
                 </div>
-                <textarea id="feedback-soul" class="chronos-textarea" rows="3" placeholder="내면의 감정, 감사한 일, 온전한 평온의 순간을 남겨보세요."></textarea>
+                <textarea id="soul-feedback" class="chronos-textarea" rows="3" placeholder="내면의 감정, 감사한 일, 온전한 평온의 순간을 남겨보세요."></textarea>
               </div>
             </div>
 
             <div class="summary-field-wrapper" style="margin-top: 16px;">
-              <label for="feedback-summary"><i class="fa-solid fa-quote-left"></i> 오늘 하루 한 줄 요약 (Today's Key Takeaway)</label>
-              <input type="text" id="feedback-summary" class="chronos-input" placeholder="예: 경청은 상대를 향한 최고의 존중이다." style="width: 100%;">
+              <label for="one-sentence-summary"><i class="fa-solid fa-quote-left"></i> 오늘 하루 한 줄 요약 (Today's Key Takeaway)</label>
+              <input type="text" id="one-sentence-summary" class="chronos-input" placeholder="예: 경청은 상대를 향한 최고의 존중이다." style="width: 100%;">
+              <p class="sentence-preview-box" id="sentence-preview-text" style="margin-top: 10px;"></p>
             </div>
 
             <div class="step-footer-actions" style="margin-top: 24px; display: flex; justify-content: space-between;">
@@ -345,9 +354,14 @@
       <!-- STEP 4: 21일 잔디 & 회고 -->
       <section class="step-view" id="view-step-4">
         <div class="chronos-banner-card">
-          <div class="step-badge">4단계: 나의 성장 달성도 (21-Day Habit Grass & Timeline)</div>
-          <h2 class="chronos-banner-title">차곡차곡 쌓인 나의 21일 회고 히트맵 잔디밭</h2>
-          <p class="chronos-banner-desc">꾸준히 기록한 성찰의 흔적이 초록색 잔디로 채워집니다.</p>
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div>
+              <div class="step-badge">4단계: 나의 성장 달성도 (21-Day Habit Grass & Timeline)</div>
+              <h2 class="chronos-banner-title">차곡차곡 쌓인 나의 21일 회고 히트맵 잔디밭</h2>
+              <p class="chronos-banner-desc">꾸준히 기록한 성찰의 흔적이 초록색 잔디로 채워집니다.</p>
+            </div>
+            <img src="assets/moldy/moldy-cheer.png" alt="몰디" class="mascot-companion-img">
+          </div>
 
           <!-- Grass Heatmap Grid Card -->
           <div class="grass-card-wrapper" style="margin-bottom: 24px;">
@@ -403,11 +417,11 @@
     <!-- FOOTER -->
     <footer style="margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border-hairline); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
       <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap;">
-        <a href="index.html" style="color: var(--accent-mint); text-decoration: none;"><i class="fa-solid fa-house"></i> 꿈모닝 메인</a>
+        <a href="index.html" style="color: var(--area-soul); text-decoration: none;"><i class="fa-solid fa-house"></i> 꿈모닝 메인</a>
         <span>•</span>
         <a href="playboard/index.html" style="color: var(--accent-blue); text-decoration: none;"><i class="fa-solid fa-gauge"></i> 관제 Playboard</a>
         <span>•</span>
-        <a href="auth.html" style="color: var(--accent-coral); text-decoration: none;"><i class="fa-solid fa-user-shield"></i> 인증/설정</a>
+        <a href="auth.html" style="color: var(--area-family); text-decoration: none;"><i class="fa-solid fa-user-shield"></i> 인증/설정</a>
       </div>
       <p>© 2026 꿈모닝 5분 피드백 (Dream Morning) — 21-Day Mindfulness Service</p>
     </footer>
@@ -438,19 +452,19 @@
 
           <div style="display: flex; flex-direction: column; gap: 10px;">
             <div>
-              <label style="font-size: 0.8rem; color: var(--accent-mint); display: block; margin-bottom: 4px;">🌱 자아 (Self) 다짐</label>
+              <label style="font-size: 0.8rem; color: var(--area-self); display: block; margin-bottom: 4px;">🌱 자아 (Self) 다짐</label>
               <input type="text" id="input-goal-self" class="chronos-input" style="width: 100%;">
             </div>
             <div>
-              <label style="font-size: 0.8rem; color: var(--accent-coral); display: block; margin-bottom: 4px;">🏡 가정 (Family) 다짐</label>
+              <label style="font-size: 0.8rem; color: var(--area-family); display: block; margin-bottom: 4px;">🏡 가정 (Family) 다짐</label>
               <input type="text" id="input-goal-family" class="chronos-input" style="width: 100%;">
             </div>
             <div>
-              <label style="font-size: 0.8rem; color: var(--accent-blue); display: block; margin-bottom: 4px;">🏢 사회 (Society) 다짐</label>
+              <label style="font-size: 0.8rem; color: var(--area-society); display: block; margin-bottom: 4px;">🏢 사회 (Society) 다짐</label>
               <input type="text" id="input-goal-society" class="chronos-input" style="width: 100%;">
             </div>
             <div>
-              <label style="font-size: 0.8rem; color: var(--accent-purple); display: block; margin-bottom: 4px;">✨ 영혼 (Soul) 다짐</label>
+              <label style="font-size: 0.8rem; color: var(--area-soul); display: block; margin-bottom: 4px;">✨ 영혼 (Soul) 다짐</label>
               <input type="text" id="input-goal-soul" class="chronos-input" style="width: 100%;">
             </div>
           </div>
@@ -474,7 +488,11 @@
         <button class="modal-close-btn" id="close-auth-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
-        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.05); padding: 4px; border-radius: var(--radius-pill);">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <img src="assets/moldy/moldy-surprised.png" alt="몰디" style="width: 84px; height: auto;">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">반가워요! 몰디와 함께 21일을 시작해봐요</p>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--bg-card-secondary); padding: 4px; border-radius: var(--radius-pill);">
           <button class="btn btn-outline active" id="tab-signup" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">회원가입</button>
           <button class="btn btn-outline" id="tab-signin" style="flex: 1; border: none; font-size: 0.88rem; padding: 8px;">로그인</button>
         </div>
@@ -511,8 +529,8 @@
         <button class="modal-close-btn" id="close-backup-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="modal-body">
-        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
-          <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="background: var(--bg-card-secondary); border: 1px solid var(--border-subtle); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
+          <h4 style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
             <span><i class="fa-solid fa-cloud" style="color: var(--accent-blue);"></i> Supabase 클라우드 동기화</span>
             <span class="chronos-badge badge-mint" id="supabase-status-badge">클라우드 연결됨</span>
           </h4>
@@ -544,7 +562,7 @@
           <input type="file" id="import-json-file" accept=".json" style="display: none;">
         </div>
 
-        <button type="button" class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; color: var(--accent-mint); border-color: rgba(52, 211, 153, 0.3);">
+        <button type="button" class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; color: var(--area-soul); border-color: rgba(22, 168, 102, 0.35);">
           <i class="fa-solid fa-flag-checkered"></i> 새 21일 챌린지 시작 (초기화)
         </button>
       </div>
