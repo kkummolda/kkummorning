@@ -10,8 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
+  <!-- FontAwesome Icons & Supabase JS SDK -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -519,7 +520,37 @@
         <h3>데이터 백업 & 설정</h3>
         <button class="modal-close-btn" id="close-backup-modal"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+        <!-- Supabase Cloud Settings Card (Top Position) -->
+        <div class="supabase-config-box" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--accent-blue); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+          <h4 style="font-size: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span><i class="fa-solid fa-cloud" style="color: var(--accent-blue);"></i> Supabase 클라우드 동기화</span>
+            <span class="chronos-badge badge-mint" id="supabase-status-badge">미연동 (로컬 전용)</span>
+          </h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">Supabase Project URL 및 Anon Key를 등록하면 클라우드에 실시간으로 데이터가 백업/동기화됩니다.</p>
+          
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Project URL</label>
+              <input type="text" id="supabase-url-input" class="chronos-input" value="https://mftamdfgyhtkwqceqmxi.supabase.co" placeholder="https://mftamdfgyhtkwqceqmxi.supabase.co" style="width: 100%; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Anon Public Key (eyJhbGci...)</label>
+              <input type="password" id="supabase-key-input" class="chronos-input" placeholder="anon public key를 여기에 붙여넣으세요" style="width: 100%; font-size: 0.85rem;">
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" id="save-supabase-config-btn" style="flex: 1; font-size: 0.88rem; padding: 8px 14px; color: #fff; background: var(--accent-blue); border-color: var(--accent-blue);">
+              <i class="fa-solid fa-plug"></i> 연동 및 저장
+            </button>
+            <button class="btn btn-outline" id="manual-sync-supabase-btn" style="flex: 1; font-size: 0.88rem; padding: 8px 14px; display: none;">
+              <i class="fa-solid fa-rotate"></i> 수동 동기화
+            </button>
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-subtle); margin-bottom: 16px;">
         <p style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-muted);">실제 챌린지를 새로 시작하거나, 샘플 데이터를 불러와 미리 체험할 수 있습니다.</p>
         <button class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; margin-bottom: 10px; color: var(--accent-mint); border-color: rgba(52, 211, 153, 0.3);">
           <i class="fa-solid fa-flag-checkered"></i> 새 21일 챌린지 시작 (초기화)

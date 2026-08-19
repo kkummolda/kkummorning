@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
         sound_type: 'rain',
         volume: 0.4
       },
+      supabase_config: {
+        url: 'https://mftamdfgyhtkwqceqmxi.supabase.co',
+        anon_key: ''
+      },
       daily_logs: []
     };
   }
@@ -681,6 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     saveState();
+    syncToSupabase();
     showToast(`Day ${dayNum} 피드백이 저장되었습니다! 💾`, 'success');
 
     // Check if 21 days completed
@@ -998,6 +1003,152 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('모든 데이터가 초기화되었습니다.', 'info');
     }
   });
+
+  // ------------------------------------------------------------------------
+  // 11. SUPABASE CLOUD BACKEND ENGINE & SYNC
+  // ------------------------------------------------------------------------
+  let supabaseClient = null;
+
+  function updateSupabaseUI(isConnected) {
+    const badge = document.getElementById('supabase-status-badge');
+    const syncBtn = document.getElementById('manual-sync-supabase-btn');
+    const urlInput = document.getElementById('supabase-url-input');
+    const keyInput = document.getElementById('supabase-key-input');
+
+    if (urlInput && state.supabase_config?.url) {
+      urlInput.value = state.supabase_config.url;
+    }
+    if (keyInput && state.supabase_config?.anon_key) {
+      keyInput.value = state.supabase_config.anon_key;
+    }
+
+    if (badge) {
+      if (isConnected) {
+        badge.className = 'chronos-badge badge-mint';
+        badge.innerHTML = '<i class="fa-solid fa-cloud"></i> 연동 완료';
+        if (syncBtn) syncBtn.style.display = 'inline-flex';
+      } else {
+        badge.className = 'chronos-badge badge-coral';
+        badge.textContent = '미연동 (로컬 전용)';
+        if (syncBtn) syncBtn.style.display = 'none';
+      }
+    }
+  }
+
+  function initSupabaseClient() {
+    const url = state.supabase_config?.url;
+    const key = state.supabase_config?.anon_key;
+
+    if (url && key && window.supabase && window.supabase.createClient) {
+      try {
+        supabaseClient = window.supabase.createClient(url, key);
+        updateSupabaseUI(true);
+        return true;
+      } catch (e) {
+        console.error('Supabase initialization failed:', e);
+        supabaseClient = null;
+        updateSupabaseUI(false);
+        return false;
+      }
+    } else {
+      supabaseClient = null;
+      updateSupabaseUI(false);
+      return false;
+    }
+  }
+
+  async function syncToSupabase(isManual = false) {
+    if (!supabaseClient) {
+      if (isManual) showToast('Supabase URL 및 Key를 먼저 연동해 주세요.', 'error');
+      return;
+    }
+
+    try {
+      if (isManual) showToast('Supabase 클라우드 동기화 중...', 'info');
+
+      // 1. Upsert User Profile
+      const profileData = {
+        user_id: state.user_profile.user_id || 'Dreamer',
+        user_name: state.user_profile.user_id || 'Dreamer',
+        oneword: state.user_profile.one_word || '경청',
+        oneword_quote: state.user_profile.one_word_quote || '',
+        goal_self: state.user_profile.four_area_goals.self || '',
+        goal_family: state.user_profile.four_area_goals.family || '',
+        goal_society: state.user_profile.four_area_goals.society || '',
+        goal_soul: state.user_profile.four_area_goals.soul || '',
+        sound_type: state.sound_settings.sound_type || 'rain',
+        volume: state.sound_settings.volume || 0.4,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: profileErr } = await supabaseClient
+        .from('user_profiles')
+        .upsert(profileData, { onConflict: 'user_id' });
+
+      if (profileErr) throw profileErr;
+
+      // 2. Upsert Daily Logs
+      if (state.daily_logs && state.daily_logs.length > 0) {
+        const logsArray = state.daily_logs.map(log => ({
+          user_id: state.user_profile.user_id || 'Dreamer',
+          date: log.date,
+          day: log.day,
+          self_feedback: log.self_feedback || '',
+          family_feedback: log.family_feedback || '',
+          society_feedback: log.society_feedback || '',
+          soul_feedback: log.soul_feedback || '',
+          one_sentence_summary: log.one_sentence_summary || '',
+          updated_at: new Date().toISOString()
+        }));
+
+        const { error: logsErr } = await supabaseClient
+          .from('daily_logs')
+          .upsert(logsArray, { onConflict: 'user_id,date' });
+
+        if (logsErr) throw logsErr;
+      }
+
+      updateSupabaseUI(true);
+      if (isManual) showToast('Supabase 클라우드 동기화 완료! ☁️', 'success');
+    } catch (err) {
+      console.error('Supabase sync error:', err);
+      if (isManual) showToast(`동기화 실패: SQL 테이블이 생성되어 있는지 확인해 주세요.`, 'error');
+    }
+  }
+
+  // Supabase Configuration Buttons Listeners
+  const saveSupabaseBtn = document.getElementById('save-supabase-config-btn');
+  if (saveSupabaseBtn) {
+    saveSupabaseBtn.addEventListener('click', async () => {
+      const url = document.getElementById('supabase-url-input').value.trim();
+      const key = document.getElementById('supabase-key-input').value.trim();
+
+      if (!url || !key) {
+        showToast('Supabase URL과 Anon Key를 모두 입력해 주세요.', 'error');
+        return;
+      }
+
+      state.supabase_config = { url, anon_key: key };
+      saveState();
+
+      if (initSupabaseClient()) {
+        showToast('Supabase 연동 정보가 저장되었습니다! 동기화를 시작합니다.', 'info');
+        await syncToSupabase(true);
+      } else {
+        showToast('Supabase 연동 실패. URL과 Key를 다시 확인해 주세요.', 'error');
+      }
+    });
+  }
+
+  const manualSyncBtn = document.getElementById('manual-sync-supabase-btn');
+  if (manualSyncBtn) {
+    manualSyncBtn.addEventListener('click', () => {
+      syncToSupabase(true);
+    });
+  }
+
+  // Initialize Supabase Client on Boot
+  initSupabaseClient();
 
   // ------------------------------------------------------------------------
   // 11. CONFETTI EFFECT FOR CELEBRATION
