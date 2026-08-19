@@ -1173,7 +1173,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth Operations: Sign In, Sign Up, Sign Out
   async function handleSignIn(email, password) {
     if (!supabaseClient) {
-      showToast('Supabase Client가 설정되지 않았습니다. API Key를 확인해 주세요.', 'error');
+      showToast('🔑 Supabase API Key가 설정되지 않았습니다. ⚙️ 설정 창에서 Key를 붙여넣고 [연동 및 저장]을 누른 뒤 다시 시도해 주세요.', 'error');
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.remove('active');
+      const backupModal = document.getElementById('backup-modal');
+      if (backupModal) backupModal.classList.add('active');
       return;
     }
 
@@ -1198,7 +1202,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleSignUp(email, password, userName) {
     if (!supabaseClient) {
-      showToast('Supabase Client가 설정되지 않았습니다. API Key를 확인해 주세요.', 'error');
+      showToast('🔑 Supabase API Key가 설정되지 않았습니다. ⚙️ 설정 창에서 Key를 붙여넣고 [연동 및 저장]을 누른 뒤 다시 시도해 주세요.', 'error');
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.remove('active');
+      const backupModal = document.getElementById('backup-modal');
+      if (backupModal) backupModal.classList.add('active');
       return;
     }
 
