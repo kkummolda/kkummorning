@@ -732,14 +732,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const saveBtn1 = document.getElementById('save-daily-btn');
   const saveBtn2 = document.getElementById('save-daily-btn-bottom');
+  const saveBtn3 = document.getElementById('save-daily-log-btn');
   if (saveBtn1) saveBtn1.addEventListener('click', saveDailyFeedback);
   if (saveBtn2) saveBtn2.addEventListener('click', saveDailyFeedback);
+  if (saveBtn3) saveBtn3.addEventListener('click', saveDailyFeedback);
 
   // ------------------------------------------------------------------------
   // 7. DASHBOARD & 21-DAY HABIT TRACKER
   // ------------------------------------------------------------------------
   function renderGrassGrid() {
-    const container = document.getElementById('grass-grid-container');
+    const container = document.getElementById('grass-grid-container') || document.getElementById('grass-grid');
+    if (!container) return;
     container.innerHTML = '';
 
     const logsMap = {};
@@ -782,7 +785,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderEntriesLogList() {
-    const container = document.getElementById('entries-log-list');
+    const container = document.getElementById('entries-log-list') || document.getElementById('timeline-log-list');
+    if (!container) return;
     container.innerHTML = '';
 
     const sortedLogs = [...state.daily_logs].sort((a, b) => b.day - a.day);
@@ -872,21 +876,32 @@ document.addEventListener('DOMContentLoaded', () => {
     editGoalsModal.classList.remove('active');
   });
 
-  document.getElementById('save-goals-modal-btn').addEventListener('click', async () => {
-    state.user_profile.user_name = document.getElementById('input-user-name').value.trim() || '드림러';
-    state.user_profile.one_word = document.getElementById('input-oneword').value.trim() || '경청';
-    state.user_profile.one_word_quote = document.getElementById('input-oneword-quote').value.trim() || '나다움을 찾아가는 삶';
-    state.user_profile.four_area_goals.self = document.getElementById('input-goal-self').value.trim();
-    state.user_profile.four_area_goals.family = document.getElementById('input-goal-family').value.trim();
-    state.user_profile.four_area_goals.society = document.getElementById('input-goal-society').value.trim();
-    state.user_profile.four_area_goals.soul = document.getElementById('input-goal-soul').value.trim();
+  async function saveGoalsHandler() {
+    const inputName = document.getElementById('input-user-name');
+    if (inputName && inputName.value.trim()) {
+      state.user_profile.user_name = inputName.value.trim();
+    }
+    state.user_profile.one_word = document.getElementById('input-oneword')?.value.trim() || '경청';
+    state.user_profile.one_word_quote = document.getElementById('input-oneword-quote')?.value.trim() || '나다움을 찾아가는 삶';
+    state.user_profile.four_area_goals.self = document.getElementById('input-goal-self')?.value.trim() || '';
+    state.user_profile.four_area_goals.family = document.getElementById('input-goal-family')?.value.trim() || '';
+    state.user_profile.four_area_goals.society = document.getElementById('input-goal-society')?.value.trim() || '';
+    state.user_profile.four_area_goals.soul = document.getElementById('input-goal-soul')?.value.trim() || '';
 
     saveStateToLocalStorage();
     await saveProfileToSupabase();
     updateUI();
-    editGoalsModal.classList.remove('active');
+    if (editGoalsModal) {
+      editGoalsModal.classList.remove('active');
+      editGoalsModal.style.display = 'none';
+    }
     showToast('원워드 및 4영역 다짐이 Supabase 클라우드에 저장되었습니다! ☁️', 'success');
-  });
+  }
+
+  const saveGoalsBtn1 = document.getElementById('save-goals-modal-btn');
+  const saveGoalsBtn2 = document.getElementById('save-goals-btn');
+  if (saveGoalsBtn1) saveGoalsBtn1.addEventListener('click', saveGoalsHandler);
+  if (saveGoalsBtn2) saveGoalsBtn2.addEventListener('click', saveGoalsHandler);
 
   // ------------------------------------------------------------------------
   // 9. 21-DAY COMPREHENSIVE REFLECTION MODAL
