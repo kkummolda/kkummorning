@@ -1210,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    showGlobalLoading('회원가입 중입니다...');
+    showGlobalLoading('회원가입 처리 중입니다...');
     try {
       const { data, error } = await supabaseClient.auth.signUp({
         email,
@@ -1225,18 +1225,61 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error) throw error;
 
       if (data.user) {
+        // Auto sign-in if session is not automatically established by Supabase
+        if (!data.session) {
+          const { data: signInData, error: signInErr } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+          if (!signInErr && signInData.user) {
+            data.user = signInData.user;
+            data.session = signInData.session;
+            currentSession = signInData.session;
+            currentUser = signInData.user;
+          }
+        } else {
+          currentSession = data.session;
+          currentUser = data.user;
+        }
+
         state.user_profile.user_id = data.user.id;
         state.user_profile.user_name = userName || email.split('@')[0];
         state.user_profile.user_email = email;
 
-        // Upsert Initial Profile to public.user_profiles
-        await saveProfileToSupabase();
-        showToast('회원가입이 완료되었습니다! 🚀', 'success');
-        document.getElementById('auth-modal').classList.remove('active');
+        // Upsert Initial Profile directly to public.user_profiles
+        const profilePayload = {
+          user_id: data.user.id,
+          user_name: userName || email.split('@')[0],
+          email: email,
+          oneword: state.user_profile.one_word || '경청',
+          oneword_quote: state.user_profile.one_word_quote || '',
+          goal_self: state.user_profile.four_area_goals?.self || '',
+          goal_family: state.user_profile.four_area_goals?.family || '',
+          goal_society: state.user_profile.four_area_goals?.society || '',
+          goal_soul: state.user_profile.four_area_goals?.soul || '',
+          sound_type: state.sound_settings?.sound_type || 'rain',
+          volume: state.sound_settings?.volume || 0.4,
+          updated_at: new Date().toISOString()
+        };
+
+        const { error: pErr } = await supabaseClient
+          .from('user_profiles')
+          .upsert(profilePayload, { onConflict: 'user_id' });
+
+        if (pErr) console.error('Initial profile upsert error:', pErr);
+
+        saveStateToLocalStorage();
+        updateAuthUI(data.user);
+        updateUI();
+
+        showToast(`${userName || email} 님 회원가입이 완료되었습니다! 🚀`, 'success');
+        const authModal = document.getElementById('auth-modal');
+        if (authModal) authModal.classList.remove('active');
+        await loadDataFromSupabase(data.user.id);
       }
     } catch (err) {
       console.error('Sign up error:', err);
-      showToast(`회원가입 실패: ${err.message}`, 'error');
+      showToast(`회원가입 안내: ${err.message || '오류가 발생했습니다. 이메일/비밀번호를 확인해주세요.'}`, 'error');
     } finally {
       hideGlobalLoading();
     }
