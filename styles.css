@@ -1,43 +1,92 @@
 /* ==========================================================================
    꿈모닝 5분 피드백 웹 (Dream Morning 5-Min Feedback)
-   Design System: Moldy Mascot / Royal Blue Playful Light Theme
+   Design System: Royal Blue Playful Light Theme
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
+/* Paperlogy — self-hosted, replaces the Inter/Outfit/Gowun Batang Google Fonts stack */
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-2ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-3Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-4Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-5Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-6SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-7Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('text/Paperlogy-8ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   /* Royal Blue Brand & Accent Tokens */
-  --accent-blue: #0123b4;         /* Royal Blue — Primary Brand */
-  --accent-blue-light: #2947e0;   /* Hover / lighter action blue */
-  --accent-blue-focus: #0123b4;   /* Focus Ring Blue */
-  --accent-blue-glow: rgba(1, 35, 180, 0.25);
+  --accent-blue: #4d5eff;         /* Royal Blue — Primary Brand */
+  --accent-blue-light: #7c86ff;   /* Hover / lighter action blue */
+  --accent-blue-focus: #4d5eff;   /* Focus Ring Blue */
+  --accent-blue-glow: rgba(77, 94, 255, 0.25);
 
-  /* Light Surface Palette */
-  --bg-black: #0b0e1f;
-  --bg-canvas: #f4f6fc;           /* Primary Light Canvas */
-  --bg-card: #ffffff;             /* Card Surface */
-  --bg-card-secondary: #eef1fb;   /* Secondary Option Surface (inputs, chips) */
-  --bg-parchment: #f5f5f7;
+  /* Elephant-App Inspired Dark Surface Palette */
+  --bg-black: #0b0c1f;
+  --bg-canvas: #12132b;           /* Primary Deep Navy-Violet Canvas */
+  --bg-card: #1c1e40;             /* Card Surface */
+  --bg-card-secondary: #15162f;   /* Secondary/Recessed Surface (inputs, chips) */
+  --bg-parchment: #1c1e40;
 
-  --border-hairline: rgba(1, 35, 180, 0.12);
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-focus: #0123b4;
+  --border-hairline: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-focus: #7c86ff;
 
   /* Typography Colors */
-  --text-main: #10162b;           /* Dark Navy Body */
-  --text-muted: #5b6178;          /* Muted Blue-Gray */
-  --text-dim: #8b90a3;            /* Secondary Fine Print Gray */
+  --text-main: #f5f5fb;           /* Near-White Body */
+  --text-muted: #9fa1c9;          /* Muted Lavender-Gray */
+  --text-dim: #6f7196;            /* Secondary Fine Print Gray */
 
-  /* 4 Areas Distinct Palette (tuned for contrast on white) */
-  --area-self: #0123b4;
-  --area-family: #ff5a5f;
-  --area-society: #7c5cff;
-  --area-soul: #16a866;
+  /* 4 Areas Distinct Palette (tuned for contrast on dark navy) */
+  --area-self: #7c86ff;
+  --area-family: #ff6b81;
+  --area-society: #b794f6;
+  --area-soul: #34d399;
 
-  /* Typography Stacks (SF Pro / Inter) */
-  --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
-  --font-body: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
-  --font-serif: 'Gowun Batang', serif;
+  /* Typography Stacks (Paperlogy, self-hosted) */
+  --font-display: 'Paperlogy', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --font-body: 'Paperlogy', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --font-serif: 'Paperlogy', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
 
   /* Radii Scale */
   --radius-none: 0px;
@@ -45,6 +94,10 @@
   --radius-md: 14px;
   --radius-lg: 22px;              /* Rounder playful cards */
   --radius-pill: 9999px;
+
+  /* Elephant-App Inspired Hero Gradient (Onboarding Mood) */
+  --gradient-hero: linear-gradient(145deg, #7c3ce0 0%, #4d5eff 55%, #100c33 100%);
+  --gradient-cta: linear-gradient(120deg, #8b5cf6, #4d5eff);
 }
 
 /* Global Reset */
@@ -52,6 +105,54 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* ==========================================================================
+   ICON SYSTEM — hand-drawn line icons (replaces Font Awesome + emoji glyphs)
+   ========================================================================== */
+.icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.14em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.icon-spin {
+  animation: icon-spin 0.9s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes icon-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Grainy illustration texture — softens flat gradient surfaces like the
+   Elephant-app hero art instead of a smooth AI-gradient look */
+.grain-texture {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain-texture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 body {
@@ -96,7 +197,7 @@ body {
   align-items: center;
   padding: 16px 28px;
   margin: 0 -28px 32px -28px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(18, 19, 43, 0.82);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--border-hairline);
@@ -109,9 +210,8 @@ body {
 }
 
 .logo-icon {
-  font-size: 1.4rem;
-  height: 34px;
-  width: 34px;
+  height: 38px;
+  width: 38px;
   object-fit: contain;
   display: block;
 }
@@ -171,7 +271,7 @@ body {
   background: var(--bg-card);
   color: var(--accent-blue);
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(1, 35, 180, 0.18);
+  box-shadow: 0 2px 8px rgba(77, 94, 255, 0.18);
 }
 
 /* Header Right Actions */
@@ -196,8 +296,8 @@ body {
 }
 
 .dday-pill {
-  background: rgba(1, 35, 180, 0.12);
-  border: 1px solid rgba(1, 35, 180, 0.3);
+  background: rgba(77, 94, 255, 0.12);
+  border: 1px solid rgba(77, 94, 255, 0.3);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
   font-size: 13px;
@@ -221,7 +321,7 @@ body {
 }
 
 .icon-btn:hover {
-  background: rgba(1, 35, 180, 0.12);
+  background: rgba(77, 94, 255, 0.12);
   border-color: var(--accent-blue);
 }
 
@@ -267,7 +367,7 @@ body {
   border-radius: var(--radius-lg);
   padding: 32px;
   margin-bottom: 32px;
-  box-shadow: 0 10px 30px rgba(1, 35, 180, 0.08);
+  box-shadow: 0 10px 30px rgba(77, 94, 255, 0.08);
 }
 
 .step-badge {
@@ -295,10 +395,73 @@ body {
   margin-bottom: 24px;
 }
 
-.mascot-companion-img {
-  width: 96px;
-  height: auto;
-  flex-shrink: 0;
+/* ELEPHANT-APP STYLE HERO BANNER (Onboarding-Mood Gradient Card) */
+.chronos-banner-card.hero-banner {
+  background: var(--gradient-hero);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.chronos-banner-card.hero-banner::before,
+.chronos-banner-card.hero-banner::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.chronos-banner-card.hero-banner::before {
+  width: 260px;
+  height: 260px;
+  background: rgba(124, 92, 255, 0.55);
+  top: -100px;
+  right: -60px;
+}
+
+.chronos-banner-card.hero-banner::after {
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 90, 95, 0.28);
+  bottom: -80px;
+  left: -40px;
+}
+
+.chronos-banner-card.hero-banner .step-badge {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.16);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+}
+
+.chronos-banner-card.hero-banner .chronos-banner-desc {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.chronos-banner-card.hero-banner .sound-controls-card {
+  background: rgba(0, 0, 0, 0.18);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.chronos-banner-card.hero-banner .timer-bg-circle {
+  stroke: rgba(255, 255, 255, 0.22);
+}
+
+.chronos-banner-card.hero-banner .timer-progress-circle {
+  stroke: #ffffff;
+}
+
+/* CTA Glow (used on primary in-flow actions) */
+.btn-glow {
+  background: var(--gradient-cta);
+  box-shadow: 0 8px 22px var(--accent-blue-glow);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 10px 28px rgba(77, 94, 255, 0.4);
 }
 
 /* BUTTON ENGINE (Apple Action Blue Capsules) */
@@ -324,24 +487,31 @@ body {
 }
 
 .btn-primary, .btn-engage {
-  background-color: var(--accent-blue);
+  background: var(--gradient-cta);
   color: #ffffff;
   font-weight: 600;
 }
 
 .btn-primary:hover, .btn-engage:hover {
-  background-color: var(--accent-blue-light);
-  box-shadow: 0 4px 16px var(--accent-blue-glow);
+  box-shadow: 0 4px 20px var(--accent-blue-glow);
+  filter: brightness(1.08);
+}
+
+.btn-primary:disabled, .btn-engage:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+  box-shadow: none;
 }
 
 .btn-outline {
   background: transparent;
   color: var(--accent-blue);
-  border: 1px solid rgba(1, 35, 180, 0.35);
+  border: 1px solid rgba(77, 94, 255, 0.35);
 }
 
 .btn-outline:hover {
-  background: rgba(1, 35, 180, 0.08);
+  background: rgba(77, 94, 255, 0.08);
   border-color: var(--accent-blue);
   color: var(--accent-blue);
 }
@@ -378,7 +548,7 @@ body {
 
 .timer-bg-circle {
   fill: none;
-  stroke: rgba(1, 35, 180, 0.1);
+  stroke: rgba(77, 94, 255, 0.1);
   stroke-width: 8;
 }
 
@@ -446,12 +616,23 @@ body {
 }
 
 .sound-chip:hover {
-  background: rgba(1, 35, 180, 0.06);
+  background: rgba(77, 94, 255, 0.06);
 }
 
 .sound-chip.active {
   border-color: var(--accent-blue);
-  background: rgba(1, 35, 180, 0.12);
+  background: rgba(77, 94, 255, 0.12);
+}
+
+.chip-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--accent-blue-light);
+}
+
+.chip-title {
+  font-size: 13.5px;
+  font-weight: 500;
 }
 
 .volume-slider-wrapper {
@@ -490,13 +671,13 @@ body {
   flex-direction: column;
   justify-content: space-between;
   min-height: 260px;
-  box-shadow: 0 10px 30px rgba(1, 35, 180, 0.08);
+  box-shadow: 0 10px 30px rgba(77, 94, 255, 0.08);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .oneword-postcard:hover {
   transform: translateY(-4px);
-  border-color: rgba(1, 35, 180, 0.4);
+  border-color: rgba(77, 94, 255, 0.4);
 }
 
 .postcard-header {
@@ -565,7 +746,7 @@ body {
   padding: 22px;
   position: relative;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 30px rgba(1, 35, 180, 0.08);
+  box-shadow: 0 10px 30px rgba(77, 94, 255, 0.08);
 }
 
 .vector-card.interactive {
@@ -574,8 +755,8 @@ body {
 
 .vector-card.interactive:hover {
   transform: translateY(-4px);
-  border-color: rgba(1, 35, 180, 0.4);
-  box-shadow: 0 16px 36px rgba(1, 35, 180, 0.16);
+  border-color: rgba(77, 94, 255, 0.4);
+  box-shadow: 0 16px 36px rgba(77, 94, 255, 0.16);
 }
 
 .vector-card.card-self { border-left: 3px solid var(--area-self); }
@@ -598,7 +779,15 @@ body {
   font-weight: 600;
   color: var(--text-main);
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
+.vector-card.card-self .vector-card-title .icon { color: var(--area-self); }
+.vector-card.card-family .vector-card-title .icon { color: var(--area-family); }
+.vector-card.card-society .vector-card-title .icon { color: var(--area-society); }
+.vector-card.card-soul .vector-card-title .icon { color: var(--area-soul); }
 
 .card-edit-btn {
   background: var(--bg-card-secondary);
@@ -626,7 +815,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(1, 35, 180, 0.06);
+  background: rgba(77, 94, 255, 0.06);
   border-radius: var(--radius-pill);
   padding: 3px 10px;
   font-size: 12px;
@@ -635,7 +824,7 @@ body {
 }
 
 .chronos-badge.badge-blue {
-  border: 1px solid rgba(1, 35, 180, 0.4);
+  border: 1px solid rgba(77, 94, 255, 0.4);
   color: var(--accent-blue);
 }
 
@@ -806,6 +995,163 @@ body {
   text-underline-offset: 4px;
 }
 
+/* STEP 3: DAILY FEEDBACK — ELEPHANT-APP STYLE COLORFUL QUAD CARDS */
+.feedback-date-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.date-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-input-wrapper label {
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.chronos-date-input {
+  background: var(--bg-card-secondary);
+  color: var(--text-main);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+}
+
+.chronos-date-input:focus {
+  border-color: var(--accent-blue-focus);
+  box-shadow: 0 0 0 3px var(--accent-blue-glow);
+}
+
+.day-tracker-chip {
+  background: rgba(77, 94, 255, 0.1);
+  border: 1px solid rgba(77, 94, 255, 0.3);
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.feedback-quad-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.feedback-field-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(77, 94, 255, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feedback-field-card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(77, 94, 255, 0.14);
+}
+
+.feedback-field-card.card-border-blue { border-top: 4px solid var(--area-self); }
+.feedback-field-card.card-border-coral { border-top: 4px solid var(--area-family); }
+.feedback-field-card.card-border-purple { border-top: 4px solid var(--area-society); }
+.feedback-field-card.card-border-mint { border-top: 4px solid var(--area-soul); }
+
+.field-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.field-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.area-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: var(--bg-card-secondary);
+}
+
+.card-border-blue .area-icon { background: rgba(77, 94, 255, 0.12); color: var(--area-self); }
+.card-border-coral .area-icon { background: rgba(255, 90, 95, 0.14); color: var(--area-family); }
+.card-border-purple .area-icon { background: rgba(124, 92, 255, 0.14); color: var(--area-society); }
+.card-border-mint .area-icon { background: rgba(22, 168, 102, 0.14); color: var(--area-soul); }
+
+.area-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.area-goal-sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.chronos-textarea {
+  width: 100%;
+  background: var(--bg-card-secondary);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 12px 14px;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.chronos-textarea:focus {
+  border-color: var(--accent-blue-focus);
+  box-shadow: 0 0 0 3px var(--accent-blue-glow);
+  background: var(--bg-card);
+}
+
+.summary-field-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  border-left: 4px solid var(--accent-blue);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.summary-field-wrapper label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
 /* STEP 4: DASHBOARD & 21-DAY HABIT VECTOR GRID */
 .dashboard-stats-grid {
   display: grid;
@@ -870,6 +1216,12 @@ body {
   color: var(--text-muted);
 }
 
+.grass-tile-status {
+  font-size: 1.1rem;
+  color: #30d158;
+  line-height: 1;
+}
+
 .grass-tile.completed .grass-tile-day {
   color: #30d158;
 }
@@ -888,7 +1240,7 @@ body {
 
 .entry-row-card:hover {
   border-color: var(--accent-blue);
-  background: rgba(1, 35, 180, 0.08);
+  background: rgba(77, 94, 255, 0.08);
 }
 
 .entry-day-tag {
@@ -924,7 +1276,7 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-hairline);
   border-radius: var(--radius-lg);
-  box-shadow: 0 25px 60px rgba(1, 35, 180, 0.25);
+  box-shadow: 0 25px 60px rgba(77, 94, 255, 0.25);
   overflow: hidden;
 }
 
@@ -1027,15 +1379,15 @@ body {
   width: 100%;
   max-width: 640px;
   z-index: 500;
-  background: rgba(22, 22, 23, 0.92);
+  background: rgba(18, 19, 43, 0.92);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-top: 1px solid var(--border-hairline);
-  display: flex;
+  display: none;
   justify-content: space-around;
   align-items: center;
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .bottom-nav-btn {
@@ -1057,8 +1409,8 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.bottom-nav-btn i {
-  font-size: 1.25rem;
+.bottom-nav-btn .icon {
+  font-size: 1.35rem;
   transition: transform 0.2s ease;
 }
 
@@ -1071,7 +1423,7 @@ body {
   font-weight: 600;
 }
 
-.bottom-nav-btn.active i {
+.bottom-nav-btn.active .icon {
   transform: scale(1.15);
 }
 
@@ -1110,7 +1462,8 @@ body {
     display: none;
   }
   .logo-icon {
-    font-size: 1.1rem;
+    height: 30px;
+    width: 30px;
   }
   .header-status {
     gap: 4px;
@@ -1140,8 +1493,7 @@ body {
   }
 
   /* Trim header to essentials on mobile: secondary items live in footer / step-4 stats instead */
-  .header-status .streak-badge,
-  .header-status a[href="playboard/index.html"] {
+  .header-status .streak-badge {
     display: none;
   }
   #open-auth-modal-btn {
@@ -1231,6 +1583,7 @@ body {
 
   /* Fixed Bottom Nav Bar Smartphone Fit */
   .bottom-app-nav {
+    display: flex;
     max-width: 100%;
     border-radius: 0;
     padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
@@ -1239,7 +1592,7 @@ body {
     padding: 4px 8px;
     font-size: 10px;
   }
-  .bottom-nav-btn i {
+  .bottom-nav-btn .icon {
     font-size: 1.15rem;
   }
 
@@ -1254,10 +1607,6 @@ body {
     font-size: 14px;
     margin-bottom: 18px;
   }
-  .mascot-companion-img {
-    width: 56px;
-  }
-
   /* STEP 1: Timer + Sound panel — stack vertically (fixes 280px column overflow) */
   .timer-ambient-grid {
     grid-template-columns: 1fr;

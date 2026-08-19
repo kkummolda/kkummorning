@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     draw() {
-      ctx.fillStyle = `rgba(1, 35, 180, ${this.opacity})`;
+      ctx.fillStyle = `rgba(220, 220, 255, ${this.opacity})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
@@ -413,32 +413,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickBtn = document.getElementById('quick-audio-btn');
     if (isAudioPlaying) {
       quickBtn.classList.add('playing');
-      quickBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+      quickBtn.innerHTML = '<svg class="icon"><use href="#icon-volume-high"></use></svg>';
     } else {
       quickBtn.classList.remove('playing');
-      quickBtn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+      quickBtn.innerHTML = '<svg class="icon"><use href="#icon-volume-mute"></use></svg>';
     }
   }
 
-  // Quick Sound Toggle & Volume Slider
-  document.getElementById('quick-audio-btn').addEventListener('click', () => {
-    if (isAudioPlaying) {
-      stopAmbientSound();
-      showToast('사운드가 켜짐 해제되었습니다.', 'info');
-    } else {
-      startAmbientSound(state.sound_settings.sound_type);
-      showToast(`${getSoundTypeName(state.sound_settings.sound_type)} 사운드가 재생됩니다.`, 'success');
-    }
-  });
+  // Quick Sound Toggle & Volume Slider (only present on the main mindfulness flow page)
+  const quickAudioBtn = document.getElementById('quick-audio-btn');
+  if (quickAudioBtn) {
+    quickAudioBtn.addEventListener('click', () => {
+      if (isAudioPlaying) {
+        stopAmbientSound();
+        showToast('사운드가 켜짐 해제되었습니다.', 'info');
+      } else {
+        startAmbientSound(state.sound_settings.sound_type);
+        showToast(`${getSoundTypeName(state.sound_settings.sound_type)} 사운드가 재생됩니다.`, 'success');
+      }
+    });
+  }
 
-  document.getElementById('volume-slider').addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
-    state.sound_settings.volume = val;
-    if (masterGain) {
-      masterGain.gain.value = val;
-    }
-    saveState();
-  });
+  const volumeSlider = document.getElementById('volume-slider');
+  if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      state.sound_settings.volume = val;
+      if (masterGain) {
+        masterGain.gain.value = val;
+      }
+      saveState();
+    });
+  }
 
   document.querySelectorAll('.sound-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -473,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalDash = 553; // 2 * PI * 88
 
   function updateTimerDisplay() {
+    if (!timerDigits || !timerRing) return;
     const mins = Math.floor(remainingSeconds / 60);
     const secs = remainingSeconds % 60;
     timerDigits.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
@@ -482,57 +489,70 @@ document.addEventListener('DOMContentLoaded', () => {
     timerRing.style.strokeDashoffset = offset;
   }
 
-  document.getElementById('start-timer-btn').addEventListener('click', () => {
-    if (!isTimerRunning) {
-      initAudioContext();
-      if (!isAudioPlaying) {
-        startAmbientSound(state.sound_settings.sound_type);
-      }
-      isTimerRunning = true;
-      timerStatus.textContent = '마음보기 5분 진행 중...';
-      document.getElementById('start-timer-btn').disabled = true;
-      document.getElementById('pause-timer-btn').disabled = false;
+  const startTimerBtn = document.getElementById('start-timer-btn');
+  const pauseTimerBtn = document.getElementById('pause-timer-btn');
+  const resetTimerBtn = document.getElementById('reset-timer-btn');
 
-      timerInterval = setInterval(() => {
-        remainingSeconds--;
-        updateTimerDisplay();
-
-        if (remainingSeconds <= 0) {
-          clearInterval(timerInterval);
-          isTimerRunning = false;
-          timerStatus.textContent = '5분 마음보기 완료!';
-          document.getElementById('start-timer-btn').disabled = false;
-          document.getElementById('pause-timer-btn').disabled = true;
-          showToast('🎉 5분 마음 보기가 완료되었습니다! 2단계로 이동하세요.', 'success');
+  if (startTimerBtn) {
+    startTimerBtn.addEventListener('click', () => {
+      if (!isTimerRunning) {
+        initAudioContext();
+        if (!isAudioPlaying) {
+          startAmbientSound(state.sound_settings.sound_type);
         }
-      }, 1000);
-    }
-  });
+        isTimerRunning = true;
+        timerStatus.textContent = '마음보기 5분 진행 중...';
+        startTimerBtn.disabled = true;
+        pauseTimerBtn.disabled = false;
 
-  document.getElementById('pause-timer-btn').addEventListener('click', () => {
-    if (isTimerRunning) {
+        timerInterval = setInterval(() => {
+          remainingSeconds--;
+          updateTimerDisplay();
+
+          if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerStatus.textContent = '5분 마음보기 완료!';
+            startTimerBtn.disabled = false;
+            pauseTimerBtn.disabled = true;
+            showToast('🎉 5분 마음 보기가 완료되었습니다! 2단계로 이동하세요.', 'success');
+          }
+        }, 1000);
+      }
+    });
+  }
+
+  if (pauseTimerBtn) {
+    pauseTimerBtn.addEventListener('click', () => {
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        timerStatus.textContent = '일시정지됨';
+        startTimerBtn.disabled = false;
+        pauseTimerBtn.disabled = true;
+      }
+    });
+  }
+
+  if (resetTimerBtn) {
+    resetTimerBtn.addEventListener('click', () => {
       clearInterval(timerInterval);
       isTimerRunning = false;
-      timerStatus.textContent = '일시정지됨';
-      document.getElementById('start-timer-btn').disabled = false;
-      document.getElementById('pause-timer-btn').disabled = true;
-    }
-  });
-
-  document.getElementById('reset-timer-btn').addEventListener('click', () => {
-    clearInterval(timerInterval);
-    isTimerRunning = false;
-    remainingSeconds = 300;
-    timerStatus.textContent = '마음 보기 준비';
-    updateTimerDisplay();
-    document.getElementById('start-timer-btn').disabled = false;
-    document.getElementById('pause-timer-btn').disabled = true;
-  });
+      remainingSeconds = 300;
+      timerStatus.textContent = '마음 보기 준비';
+      updateTimerDisplay();
+      startTimerBtn.disabled = false;
+      pauseTimerBtn.disabled = true;
+    });
+  }
 
   // ------------------------------------------------------------------------
   // 5. STEPPER NAVIGATION & VIEW SWITCHING
   // ------------------------------------------------------------------------
   function switchStep(stepNum) {
+    const targetView = document.getElementById(`view-step-${stepNum}`);
+    if (!targetView) return;
+
     document.querySelectorAll('.step-tab-btn, .nav-link-btn, .bottom-nav-btn').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-step') == stepNum);
     });
@@ -540,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.step-view').forEach(view => {
       view.classList.remove('active');
     });
-    document.getElementById(`view-step-${stepNum}`).classList.add('active');
+    targetView.classList.add('active');
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -571,9 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const summaryInput = document.getElementById('one-sentence-summary');
   const sentencePreview = document.getElementById('sentence-preview-text');
 
-  // Set default date to today (Local Timezone)
+  // Set default date to today (Local Timezone) — feedback form only exists on the challenge app page
   const todayStr = getLocalDateString();
-  feedbackDateInput.value = todayStr;
+  if (feedbackDateInput) feedbackDateInput.value = todayStr;
 
   function getLogForDate(dateStr) {
     return state.daily_logs.find(log => log.date === dateStr);
@@ -613,9 +633,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSentencePreview();
   }
 
-  feedbackDateInput.addEventListener('change', (e) => {
-    populateFeedbackForm(e.target.value);
-  });
+  if (feedbackDateInput) {
+    feedbackDateInput.addEventListener('change', (e) => {
+      populateFeedbackForm(e.target.value);
+    });
+  }
 
   function updateCharCounters() {
     const counterSelf = document.getElementById('counter-self');
@@ -629,16 +651,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   [selfInput, familyInput, societyInput, soulInput].forEach(el => {
+    if (!el) return;
     el.addEventListener('input', () => {
       updateCharCounters();
       triggerAutosaveIndicator();
     });
   });
 
-  summaryInput.addEventListener('input', () => {
-    updateSentencePreview();
-    triggerAutosaveIndicator();
-  });
+  if (summaryInput) {
+    summaryInput.addEventListener('input', () => {
+      updateSentencePreview();
+      triggerAutosaveIndicator();
+    });
+  }
 
   function updateSentencePreview() {
     const val = summaryInput.value.trim() || '나의 소리를 조용히 찾아가는 하루';
@@ -669,12 +694,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const indicator = document.getElementById('autosave-indicator');
     if (!indicator) return;
     indicator.style.color = '#c084fc';
-    indicator.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> 입력 중...';
+    indicator.innerHTML = '<svg class="icon"><use href="#icon-cloud-upload"></use></svg> 입력 중...';
 
     clearTimeout(autosaveTimer);
     autosaveTimer = setTimeout(() => {
       indicator.style.color = '#10b981';
-      indicator.innerHTML = '<i class="fa-solid fa-check"></i> 자동 임시 저장됨';
+      indicator.innerHTML = '<svg class="icon"><use href="#icon-check"></use></svg> 자동 임시 저장됨';
     }, 800);
   }
 
@@ -767,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tile.innerHTML = `
         <div class="grass-tile-day">Day ${day}</div>
-        <div class="grass-tile-status">${log ? '✨' : '⚪'}</div>
+        <div class="grass-tile-status">${log ? '<svg class="icon"><use href="#icon-sparkle"></use></svg>' : '<svg class="icon" style="opacity:0.35"><use href="#icon-leaf"></use></svg>'}</div>
         <div class="grass-tile-date">${log ? log.date.slice(5) : ''}</div>
       `;
 
@@ -851,10 +876,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  document.getElementById('open-edit-goals-btn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    openGoalsModal('oneword');
-  });
+  const openEditGoalsBtn = document.getElementById('open-edit-goals-btn');
+  if (openEditGoalsBtn) {
+    openEditGoalsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openGoalsModal('oneword');
+    });
+  }
 
   // Allow clicking any Step 2 Card or Edit Button to open modal directly
   document.querySelectorAll('[data-edit-target]').forEach(el => {
@@ -875,12 +903,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  document.getElementById('close-goals-modal').addEventListener('click', () => {
-    editGoalsModal.classList.remove('active');
-  });
-  document.getElementById('cancel-goals-modal').addEventListener('click', () => {
-    editGoalsModal.classList.remove('active');
-  });
+  const closeGoalsModalBtn = document.getElementById('close-goals-modal');
+  if (closeGoalsModalBtn) {
+    closeGoalsModalBtn.addEventListener('click', () => {
+      editGoalsModal.classList.remove('active');
+    });
+  }
+  const cancelGoalsModalBtn = document.getElementById('cancel-goals-modal');
+  if (cancelGoalsModalBtn) {
+    cancelGoalsModalBtn.addEventListener('click', () => {
+      editGoalsModal.classList.remove('active');
+    });
+  }
 
   async function saveGoalsHandler() {
     const inputName = document.getElementById('input-user-name');
@@ -901,7 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
       editGoalsModal.classList.remove('active');
       editGoalsModal.style.display = 'none';
     }
-    showToast('원워드 및 4영역 다짐이 Supabase 클라우드에 저장되었습니다! ☁️', 'success');
+    showToast('원워드 및 4영역 다짐이 클라우드에 저장되었습니다! ☁️', 'success');
   }
 
   const saveGoalsBtn1 = document.getElementById('save-goals-modal-btn');
@@ -969,67 +1003,82 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ------------------------------------------------------------------------
-  // 10. BACKUP & RESTORE MODAL
+  // 10. BACKUP & RESTORE MODAL (index.html challenge app only)
   // ------------------------------------------------------------------------
   const backupModal = document.getElementById('backup-modal');
+  const openBackupBtn = document.getElementById('open-backup-btn');
 
-  document.getElementById('open-backup-btn').addEventListener('click', () => {
-    backupModal.classList.add('active');
-  });
-  document.getElementById('close-backup-modal').addEventListener('click', () => {
-    backupModal.classList.remove('active');
-  });
+  if (backupModal && openBackupBtn) {
+    openBackupBtn.addEventListener('click', () => {
+      backupModal.classList.add('active');
+    });
+    const closeBackupModalBtn = document.getElementById('close-backup-modal');
+    if (closeBackupModalBtn) {
+      closeBackupModalBtn.addEventListener('click', () => {
+        backupModal.classList.remove('active');
+      });
+    }
 
-  // JSON Export
-  document.getElementById('export-json-btn').addEventListener('click', () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `dream_morning_backup_${state.user_profile.user_id}_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    showToast('JSON 데이터 백업 파일이 다운로드되었습니다.', 'success');
-  });
+    // JSON Export
+    const exportJsonBtn = document.getElementById('export-json-btn');
+    if (exportJsonBtn) {
+      exportJsonBtn.addEventListener('click', () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `dream_morning_backup_${state.user_profile.user_id}_${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        showToast('JSON 데이터 백업 파일이 다운로드되었습니다.', 'success');
+      });
+    }
 
-  // JSON Import
-  const fileInput = document.getElementById('import-json-file');
-  document.getElementById('import-json-btn').addEventListener('click', () => {
-    fileInput.click();
-  });
+    // JSON Import
+    const fileInput = document.getElementById('import-json-file');
+    const importJsonBtn = document.getElementById('import-json-btn');
+    if (importJsonBtn && fileInput) {
+      importJsonBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
 
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const imported = JSON.parse(event.target.result);
-        if (imported.user_profile && imported.daily_logs) {
-          state = imported;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            if (imported.user_profile && imported.daily_logs) {
+              state = imported;
+              saveState();
+              backupModal.classList.remove('active');
+              showToast('데이터 복원이 성공적으로 완료되었습니다!', 'success');
+            } else {
+              showToast('올바르지 않은 데이터 형식입니다.', 'error');
+            }
+          } catch (err) {
+            showToast('JSON 파일 파싱 실패', 'error');
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    // Start New 21-Day Challenge
+    const startNewChallengeBtn = document.getElementById('start-new-challenge-btn');
+    if (startNewChallengeBtn) {
+      startNewChallengeBtn.addEventListener('click', () => {
+        if (confirm('새로운 21일 챌린지를 시작하시겠습니까? (기존 기록이 초기화됩니다)')) {
+          state = createDefaultState();
           saveState();
           backupModal.classList.remove('active');
-          showToast('데이터 복원이 성공적으로 완료되었습니다!', 'success');
-        } else {
-          showToast('올바르지 않은 데이터 형식입니다.', 'error');
+          showToast('새 21일 챌린지가 시작되었습니다! 🎯 2단계에서 목표를 설정해 보세요.', 'success');
         }
-      } catch (err) {
-        showToast('JSON 파일 파싱 실패', 'error');
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  // Start New 21-Day Challenge
-  document.getElementById('start-new-challenge-btn').addEventListener('click', () => {
-    if (confirm('새로운 21일 챌린지를 시작하시겠습니까? (기존 기록이 초기화됩니다)')) {
-      state = createDefaultState();
-      saveState();
-      backupModal.classList.remove('active');
-      showToast('새 21일 챌린지가 시작되었습니다! 🎯 2단계에서 목표를 설정해 보세요.', 'success');
+      });
     }
-  });
+  }
 
   // Load Sample (Virtual) Data
   const loadSampleDataBtn = document.getElementById('load-sample-data-btn');
@@ -1134,7 +1183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badge) {
       if (isConnected) {
         badge.className = 'chronos-badge badge-mint';
-        badge.innerHTML = '<i class="fa-solid fa-cloud"></i> DB 연결됨';
+        badge.innerHTML = '<svg class="icon"><use href="#icon-cloud"></use></svg> DB 연결됨';
         if (syncBtn) syncBtn.style.display = 'inline-flex';
       } else {
         badge.className = 'chronos-badge badge-coral';
@@ -1187,8 +1236,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       updateAuthUI(currentUser);
 
-      if (event === 'SIGNED_IN' && currentUser) {
-        showGlobalLoading('Supabase 클라우드 데이터 불러오는 중...');
+      if (event === 'PASSWORD_RECOVERY') {
+        if (typeof window.openAuthModal === 'function') window.openAuthModal();
+        const resetCard = document.getElementById('reset-password-card');
+        if (resetCard) resetCard.style.display = 'block';
+        showToast('새 비밀번호를 입력해 주세요.', 'info');
+      } else if (event === 'SIGNED_IN' && currentUser) {
+        showGlobalLoading('클라우드에서 데이터 불러오는 중...');
         await loadDataFromSupabase(currentUser.id);
         await checkAndMigrateLocalStorage(currentUser);
         hideGlobalLoading();
@@ -1205,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSession = session;
         currentUser = session.user;
         updateAuthUI(currentUser);
-        showGlobalLoading('Supabase 클라우드 데이터 불러오는 중...');
+        showGlobalLoading('클라우드에서 데이터 불러오는 중...');
         await loadDataFromSupabase(currentUser.id);
         await checkAndMigrateLocalStorage(currentUser);
         hideGlobalLoading();
@@ -1253,11 +1307,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth Operations: Sign In, Sign Up, Sign Out
   async function handleSignIn(email, password) {
     if (!supabaseClient) {
-      showToast('🔑 Supabase API Key가 설정되지 않았습니다. ⚙️ 설정 창에서 Key를 붙여넣고 [연동 및 저장]을 누른 뒤 다시 시도해 주세요.', 'error');
-      const authModal = document.getElementById('auth-modal');
-      if (authModal) authModal.classList.remove('active');
-      const backupModal = document.getElementById('backup-modal');
-      if (backupModal) backupModal.classList.add('active');
+      showToast('🔑 일시적인 서버 연결 오류입니다. 잠시 후 다시 시도해 주세요.', 'error');
       return;
     }
 
@@ -1293,13 +1343,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function handleSignUp(email, password, userName) {
     if (!supabaseClient) {
-      showToast('🔑 Supabase API Key가 설정되지 않았습니다. ⚙️ 설정 창에서 Key를 붙여넣고 [연동 및 저장]을 누른 뒤 다시 시도해 주세요.', 'error');
-      window.closeAuthModal();
-      const backupModal = document.getElementById('backup-modal');
-      if (backupModal) {
-        backupModal.classList.add('active');
-        backupModal.style.display = 'flex';
-      }
+      showToast('🔑 일시적인 서버 연결 오류입니다. 잠시 후 다시 시도해 주세요.', 'error');
       return;
     }
 
@@ -1347,11 +1391,18 @@ document.addEventListener('DOMContentLoaded', () => {
             email,
             password
           });
-          if (!signInErr && signInData.user) {
+          if (!signInErr && signInData.session) {
             data.user = signInData.user;
             data.session = signInData.session;
             currentSession = signInData.session;
             currentUser = signInData.user;
+          } else {
+            // Email confirmation required before a session can be created —
+            // do NOT mark the user as signed in, since no session exists yet.
+            showToast('회원가입이 완료되었습니다! 📧 이메일함에서 인증 링크를 확인한 후 로그인해 주세요.', 'success');
+            window.closeAuthModal();
+            hideGlobalLoading();
+            return;
           }
         } else {
           currentSession = data.session;
@@ -1398,6 +1449,53 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('Sign up error:', err);
       showToast(`가입/로그인 안내: ${formatAuthErrorMessage(err.message)}`, 'error');
+    } finally {
+      hideGlobalLoading();
+    }
+  }
+
+  async function handleForgotPassword(email) {
+    if (!supabaseClient) {
+      showToast('🔑 클라우드 연동이 아직 설정되지 않았습니다. 잠시 후 다시 시도해 주세요.', 'error');
+      return;
+    }
+    if (!email) {
+      showToast('먼저 이메일 주소를 입력해 주세요.', 'error');
+      return;
+    }
+
+    showGlobalLoading('재설정 메일 전송 중...');
+    try {
+      const redirectTo = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'auth.html';
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) throw error;
+      showToast(`${email} 주소로 비밀번호 재설정 링크를 보냈습니다. 메일함을 확인해 주세요.`, 'success');
+    } catch (err) {
+      console.error('Reset password email error:', err);
+      showToast(`재설정 메일 전송 실패: ${err.message || '잠시 후 다시 시도해 주세요.'}`, 'error');
+    } finally {
+      hideGlobalLoading();
+    }
+  }
+
+  async function handleUpdatePassword(newPassword) {
+    if (!supabaseClient) return;
+    if (!newPassword || newPassword.length < 6) {
+      showToast('비밀번호는 6자 이상이어야 합니다.', 'error');
+      return;
+    }
+
+    showGlobalLoading('비밀번호 변경 중...');
+    try {
+      const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      showToast('비밀번호가 변경되었습니다. 새 비밀번호로 이용해 주세요.', 'success');
+      const resetCard = document.getElementById('reset-password-card');
+      if (resetCard) resetCard.style.display = 'none';
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    } catch (err) {
+      console.error('Update password error:', err);
+      showToast(`비밀번호 변경 실패: ${err.message || '잠시 후 다시 시도해 주세요.'}`, 'error');
     } finally {
       hideGlobalLoading();
     }
@@ -1591,7 +1689,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (count === 0 && localData.daily_logs.length > 0) {
-        showToast('기존 로컬 일지를 Supabase 클라우드로 이전 중입니다... 📦', 'info');
+        showToast('기존 로컬 일지를 클라우드로 이전 중입니다... 📦', 'info');
 
         // Migrate Profile
         if (localData.user_profile) {
@@ -1633,7 +1731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (batchErr) throw batchErr;
 
         localStorage.setItem(MIGRATION_FLAG, 'true');
-        showToast('기존 로컬 기록이 Supabase 클라우드로 안전하게 마이그레이션되었습니다! ☁️✨', 'success');
+        showToast('기존 로컬 기록이 클라우드로 안전하게 이전되었습니다! ☁️✨', 'success');
         await loadDataFromSupabase(user.id);
       } else {
         localStorage.setItem(MIGRATION_FLAG, 'true');
@@ -1705,7 +1803,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabSignin.classList.add('active');
       tabSignup.classList.remove('active');
       if (nameGroup) nameGroup.style.display = 'none';
-      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> 로그인';
+      if (submitBtn) submitBtn.innerHTML = '<svg class="icon"><use href="#icon-login"></use></svg> 로그인';
     });
 
     tabSignup.addEventListener('click', () => {
@@ -1713,7 +1811,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabSignup.classList.add('active');
       tabSignin.classList.remove('active');
       if (nameGroup) nameGroup.style.display = 'block';
-      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> 회원가입';
+      if (submitBtn) submitBtn.innerHTML = '<svg class="icon"><use href="#icon-user-plus"></use></svg> 회원가입';
     });
   }
 
@@ -1742,6 +1840,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (logoutIcon) logoutIcon.addEventListener('click', (e) => {
     e.stopPropagation();
     handleSignOut();
+  });
+
+  const forgotPasswordLink = document.getElementById('forgot-password-link');
+  if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', () => {
+    const email = document.getElementById('auth-email-input')?.value.trim();
+    handleForgotPassword(email);
+  });
+
+  const updatePasswordBtn = document.getElementById('update-password-btn');
+  if (updatePasswordBtn) updatePasswordBtn.addEventListener('click', () => {
+    const newPassword = document.getElementById('new-password-input')?.value.trim();
+    handleUpdatePassword(newPassword);
   });
 
   const saveSupabaseConfigBtn = document.getElementById('save-supabase-config-btn');
@@ -1819,6 +1929,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateUI() {
+    // This renders the challenge app's own widgets (feedback form, stats, grass grid) —
+    // pages without that UI (e.g. auth.html) only need the header profile pill, handled by updateAuthUI().
+    if (!feedbackDateInput) return;
+
     // 1. Profile & Postcard
     const displayName = state.user_profile.user_name || state.user_profile.user_id || 'Dreamer';
     document.getElementById('display-user-id').textContent = displayName;
@@ -1881,11 +1995,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
 
-    let icon = 'fa-circle-info';
-    if (type === 'success') icon = 'fa-circle-check';
-    if (type === 'error') icon = 'fa-circle-exclamation';
+    let icon = 'icon-circle-info';
+    if (type === 'success') icon = 'icon-circle-check';
+    if (type === 'error') icon = 'icon-circle-exclamation';
 
-    toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${escapeHTML(message)}</span>`;
+    toast.innerHTML = `<svg class="icon"><use href="#${icon}"></use></svg> <span>${escapeHTML(message)}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
