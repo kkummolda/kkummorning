@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>꿈모닝 - 4단계: 21일 잔디 & 회고 (Dashboard & Timeline)</title>
+  <meta name="description" content="21일간의 챌린지 성찰 히트맵 잔디밭과 회고 기록 타임라인을 확인하는 달성도 독립 프로토타입 페이지입니다.">
+  <meta name="theme-color" content="#0b0e17">
+  <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome & Supabase SDK -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- PLAYBOARD NAVIGATION HEADER -->
+    <header class="app-header">
+      <div class="header-brand">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <div class="logo-icon">🌙</div>
+          <div class="brand-text">
+            <h1>꿈모닝 <span style="font-size: 0.7rem; color: var(--accent-mint); font-weight: 500;">(Page Prototype 4)</span></h1>
+          </div>
+        </a>
+      </div>
+
+      <nav class="stepper-nav-header">
+        <a href="index.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard</a>
+        <a href="step1-mindfulness.html" class="nav-link-btn" style="text-decoration: none;">1단계: 마음 보기</a>
+        <a href="step2-values.html" class="nav-link-btn" style="text-decoration: none;">2단계: 가치 생각</a>
+        <a href="step3-feedback.html" class="nav-link-btn" style="text-decoration: none;">3단계: 일일 피드백</a>
+        <a href="step4-dashboard.html" class="nav-link-btn active" style="text-decoration: none;">4단계: 21일 잔디</a>
+        <a href="pages-list.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-list"></i> 목록</a>
+      </nav>
+
+      <div class="header-status">
+        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
+          <i class="fa-solid fa-right-to-bracket"></i> 로그인 / 가입
+        </button>
+        <div class="user-profile-pill" id="header-user-profile" style="display: none; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
+          <i class="fa-solid fa-circle-user"></i> <span id="header-user-name">Dreamer</span>
+          <i class="fa-solid fa-right-from-bracket" id="header-logout-icon" title="로그아웃" style="margin-left: 4px; opacity: 0.7;"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content" style="margin-top: 20px;">
+      <!-- STEP 4: 21일 잔디 & 회고 -->
+      <section class="step-view active" id="view-step-4">
+        <div class="chronos-banner-card">
+          <div class="step-badge">4단계: 나의 성장 달성도 (21-Day Habit Grass & Timeline)</div>
+          <h2 class="chronos-banner-title">차곡차곡 쌓인 나의 21일 회고 히트맵 잔디밭</h2>
+          <p class="chronos-banner-desc">꾸준히 기록한 성찰의 흔적이 초록색 잔디로 채워집니다.</p>
+
+          <!-- Grass Heatmap Grid Card -->
+          <div class="grass-card-wrapper" style="margin-bottom: 24px;">
+            <div class="grass-header">
+              <div class="grass-title-area">
+                <h3><i class="fa-solid fa-border-all"></i> 21일 습관 형성 히트맵 (Grass Grid)</h3>
+                <p>각 타일을 클릭하면 해당 일자의 피드백을 조회할 수 있습니다.</p>
+              </div>
+              <div class="grass-legend">
+                <span class="legend-item"><span class="legend-box level-0"></span> 미작성</span>
+                <span class="legend-item"><span class="legend-box level-1"></span> 시작</span>
+                <span class="legend-item"><span class="legend-box level-2"></span> 진행</span>
+                <span class="legend-item"><span class="legend-box level-3"></span> 작성완료</span>
+              </div>
+            </div>
+
+            <!-- 21 Grid Tiles -->
+            <div class="grass-grid-container" id="grass-grid"></div>
+          </div>
+
+          <!-- Past Logs Timeline View -->
+          <div class="timeline-logs-card">
+            <div class="timeline-header">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> 지난 피드백 일기 타임라인</h3>
+              <span class="chronos-badge badge-mint" id="timeline-count-badge">0개 기록됨</span>
+            </div>
+            <div class="timeline-list" id="timeline-log-list"></div>
+          </div>
+
+          <div class="step-footer-actions" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <a href="step3-feedback.html" class="btn btn-outline" style="text-decoration: none;">
+              <i class="fa-solid fa-chevron-left"></i> 이전: 3단계 피드백 작성
+            </a>
+            <a href="index.html" class="btn btn-primary" style="text-decoration: none;">
+              <i class="fa-solid fa-gauge"></i> Playboard 상황판으로 이동 <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="app.js"></script>
+</body>
+</html>

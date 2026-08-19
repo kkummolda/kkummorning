@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>꿈모닝 - 전체 프로토타입 화면 목록 (Pages Catalog)</title>
+  <meta name="description" content="꿈모닝 앱 프로젝트의 모든 개별 화면 및 프로토타입 페이지에 직접 접근할 수 있는 통합 목록 디렉토리 카탈로그입니다.">
+  <meta name="theme-color" content="#0b0e17">
+  <!-- Google Fonts: Inter, Outfit, Gowun Batang -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .page-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .page-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .page-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .page-icon {
+      font-size: 1.6rem;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .page-card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .page-card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+    .page-url-code {
+      font-family: monospace;
+      font-size: 0.78rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: var(--accent-mint);
+      border: 1px solid rgba(52, 211, 153, 0.2);
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="ambient-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- PLAYBOARD NAVIGATION HEADER -->
+    <header class="app-header">
+      <div class="header-brand">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <div class="logo-icon">🌙</div>
+          <div class="brand-text">
+            <h1>꿈모닝 <span style="font-size: 0.7rem; color: var(--accent-mint); font-weight: 500;">(Pages Catalog)</span></h1>
+          </div>
+        </a>
+      </div>
+
+      <nav class="stepper-nav-header">
+        <a href="index.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-gauge"></i> Playboard 메인</a>
+        <a href="pages-list.html" class="nav-link-btn active" style="text-decoration: none;"><i class="fa-solid fa-list"></i> (b) 화면 목록</a>
+        <a href="ux-flow.html" class="nav-link-btn" style="text-decoration: none;"><i class="fa-solid fa-diagram-project"></i> (c) UX Flow</a>
+      </nav>
+
+      <div class="header-status">
+        <a href="auth.html" class="btn btn-outline btn-sm" style="text-decoration: none; padding: 4px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue);">
+          <i class="fa-solid fa-user-shield"></i> 인증/설정
+        </a>
+      </div>
+    </header>
+
+    <main class="main-content" style="margin-top: 24px;">
+      <div class="chronos-banner-card">
+        <div class="step-badge">(b) 프로토타입 화면 디렉토리 목록 (Pages Catalog)</div>
+        <h2 class="chronos-banner-title">꿈모닝 프로젝트 전체 화면 카탈로그 디렉토리</h2>
+        <p class="chronos-banner-desc">각 기능별 독립 실행 가능한 프로토타입 페이지의 개별 URL 주소와 담당 기능 상세 목록입니다.</p>
+
+        <div class="catalog-grid">
+          <!-- Page 1: Playboard Main Hub -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-blue">Playboard Hub</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">📊</div>
+                <div class="page-card-title">Playboard 통합 메인 상황판</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/index.html</div>
+              <p class="page-card-desc">
+                전체 프로젝트 시스템 라이브 상태(Supabase, PWA, 서버) 모니터링 및 모든 기능/목록/UX Flow를 총괄하는 최상위 AI 네이티브 Playboard 상황판.
+              </p>
+            </div>
+            <a href="index.html" class="btn btn-primary" style="text-decoration: none; justify-content: center;">
+              <i class="fa-solid fa-arrow-right"></i> 메인 상황판 열기
+            </a>
+          </div>
+
+          <!-- Page 2: Step 1 Mindfulness -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-mint">Step 1 Prototype</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">🧘</div>
+                <div class="page-card-title">1단계: 마음 보기 (Mindfulness)</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/step1-mindfulness.html</div>
+              <p class="page-card-desc">
+                오늘 하루의 소음을 끄는 5분 명상 SVG 원형 타이머, 4가지 힐링 백색소음/오르골 오디오 플레이어 및 음량 조절 독립 페이지.
+              </p>
+            </div>
+            <a href="step1-mindfulness.html" class="btn btn-outline" style="text-decoration: none; justify-content: center; color: var(--accent-mint); border-color: var(--accent-mint);">
+              <i class="fa-solid fa-arrow-right"></i> 마음 보기 화면 이동
+            </a>
+          </div>
+
+          <!-- Page 3: Step 2 Values -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-coral">Step 2 Prototype</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">🔖</div>
+                <div class="page-card-title">2단계: 가치 생각 (One Word)</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/step2-values.html</div>
+              <p class="page-card-desc">
+                나다움의 핵심 키워드(One Word) 선언 엽서 카드 및 자아·가정·사회·영혼 4대 영역 다짐 카드를 편집/저장하는 독립 페이지.
+              </p>
+            </div>
+            <a href="step2-values.html" class="btn btn-outline" style="text-decoration: none; justify-content: center; color: var(--accent-coral); border-color: var(--accent-coral);">
+              <i class="fa-solid fa-arrow-right"></i> 가치 생각 화면 이동
+            </a>
+          </div>
+
+          <!-- Page 4: Step 3 Feedback -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-blue">Step 3 Prototype</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">📝</div>
+                <div class="page-card-title">3단계: 일일 피드백 (Daily Feedback)</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/step3-feedback.html</div>
+              <p class="page-card-desc">
+                날짜별 4대 영역 성찰 일기와 한 줄 요약을 작성하고 Supabase Postgres DB(`daily_logs`)에 실시간 전송 저장하는 독립 페이지.
+              </p>
+            </div>
+            <a href="step3-feedback.html" class="btn btn-outline" style="text-decoration: none; justify-content: center; color: var(--accent-blue); border-color: var(--accent-blue);">
+              <i class="fa-solid fa-arrow-right"></i> 일일 피드백 화면 이동
+            </a>
+          </div>
+
+          <!-- Page 5: Step 4 Dashboard -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-purple">Step 4 Prototype</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">🌱</div>
+                <div class="page-card-title">4단계: 21일 잔디 & 회고 (Dashboard)</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/step4-dashboard.html</div>
+              <p class="page-card-desc">
+                21일간의 챌린지 성찰 달성 히트맵 잔디밭 시각화, 연속 달성 스트릭 카운터, 지난 일기 타임라인 조회 및 삭제 기능 독립 페이지.
+              </p>
+            </div>
+            <a href="step4-dashboard.html" class="btn btn-outline" style="text-decoration: none; justify-content: center; color: var(--accent-purple); border-color: var(--accent-purple);">
+              <i class="fa-solid fa-arrow-right"></i> 21일 잔디 화면 이동
+            </a>
+          </div>
+
+          <!-- Page 6: Auth & Settings -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-mint">Auth & Cloud</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">🔐</div>
+                <div class="page-card-title">회원가입/로그인 & 클라우드 설정</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/auth.html</div>
+              <p class="page-card-desc">
+                Supabase Auth 회원가입 및 로그인 처리, Publishable Anon Key 연동 및 작성자 프로필 닉네임 관리 독립 설정 페이지.
+              </p>
+            </div>
+            <a href="auth.html" class="btn btn-outline" style="text-decoration: none; justify-content: center; color: var(--text-muted); border-color: var(--border-hairline);">
+              <i class="fa-solid fa-arrow-right"></i> 인증/설정 화면 이동
+            </a>
+          </div>
+
+          <!-- Page 7: UX Flow Overview -->
+          <div class="page-card">
+            <div>
+              <div class="page-badge-row">
+                <span class="chronos-badge badge-blue">UX Flow Overview</span>
+                <span class="chronos-badge badge-mint">🟢 라이브 연동</span>
+              </div>
+              <div class="page-icon-title">
+                <div class="page-icon">🗺️</div>
+                <div class="page-card-title">사용자 유형별 UX Flow 오버뷰</div>
+              </div>
+              <div class="page-url-code">http://localhost:8080/ux-flow.html</div>
+              <p class="page-card-desc">
+                신규 챌린저, 매일 밤 회고 작성자, 성장 데이터 분석가 등 페르소나별 핵심 이동 경로와 페이지 카드 배치 오버뷰.
+              </p>
+            </div>
+            <a href="ux-flow.html" class="btn btn-engage" style="text-decoration: none; justify-content: center;">
+              <i class="fa-solid fa-diagram-project"></i> UX Flow 오버뷰 보기
+            </a>
+          </div>
+        </div>
+
+        <div class="step-footer-actions" style="margin-top: 30px; text-align: center;">
+          <a href="index.html" class="btn btn-primary btn-glow" style="text-decoration: none;">
+            <i class="fa-solid fa-gauge"></i> Playboard 메인 상황판으로 돌아가기
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
