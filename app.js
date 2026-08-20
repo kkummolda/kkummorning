@@ -211,8 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
   //    무음(zero-output)이 되는 브라우저 버그가 있어 사용하지 않는다).
   // ------------------------------------------------------------------------
   let isAudioPlaying = false;
+  let isAudioMuted = false;
   let currentAudioEl = null;
 
+  // 곡을 처음부터 (다시) 재생한다 — 재생 버튼을 새로 누르거나, 재생 중 다른 곡으로 바꿀 때 사용.
   function startAmbientSound(type) {
     stopAmbientSound();
 
@@ -221,13 +223,32 @@ document.addEventListener('DOMContentLoaded', () => {
     currentAudioEl = new Audio(`music/${encodeURIComponent(type)}.mp3`);
     currentAudioEl.loop = true;
     currentAudioEl.volume = state.sound_settings.volume;
+    currentAudioEl.muted = isAudioMuted;
 
     currentAudioEl.play().catch(err => console.warn('미덕 음악 재생 실패:', err));
 
     isAudioPlaying = true;
-    updateAudioBtnState();
   }
 
+  // 일시정지했던 곡을 같은 위치에서 이어 재생한다. 아직 아무 곡도 로드되지 않았다면 새로 시작한다.
+  function resumeAmbientSound() {
+    if (currentAudioEl) {
+      currentAudioEl.play().catch(err => console.warn('미덕 음악 재생 실패:', err));
+      isAudioPlaying = true;
+    } else {
+      startAmbientSound(state.sound_settings.sound_type);
+    }
+  }
+
+  // 재생 위치를 유지한 채로 멈춘다(음악을 완전히 끄지 않음) — "일시정지" 전용.
+  function pauseAmbientSound() {
+    if (currentAudioEl) {
+      currentAudioEl.pause();
+    }
+    isAudioPlaying = false;
+  }
+
+  // 곡을 완전히 멈추고 재생 위치를 버린다 — "처음부터"나 곡 전환에 사용.
   function stopAmbientSound() {
     if (currentAudioEl) {
       currentAudioEl.pause();
@@ -235,31 +256,27 @@ document.addEventListener('DOMContentLoaded', () => {
       currentAudioEl = null;
     }
     isAudioPlaying = false;
-    updateAudioBtnState();
   }
 
-  function updateAudioBtnState() {
+  function updateMuteBtnState() {
     const quickBtn = document.getElementById('quick-audio-btn');
-    if (isAudioPlaying) {
-      quickBtn.classList.add('playing');
-      quickBtn.innerHTML = '<svg class="icon"><use href="#icon-volume-high"></use></svg>';
-    } else {
-      quickBtn.classList.remove('playing');
-      quickBtn.innerHTML = '<svg class="icon"><use href="#icon-volume-mute"></use></svg>';
-    }
+    if (!quickBtn) return;
+    quickBtn.classList.toggle('muted', isAudioMuted);
+    quickBtn.innerHTML = isAudioMuted
+      ? '<svg class="icon"><use href="#icon-volume-mute"></use></svg>'
+      : '<svg class="icon"><use href="#icon-volume-high"></use></svg>';
   }
 
-  // Quick Sound Toggle & Volume Slider (only present on the main mindfulness flow page)
+  // 헤더 스피커 아이콘 — 재생/일시정지와는 무관하게 소리만 껐다 켜는 순수 음소거 토글.
   const quickAudioBtn = document.getElementById('quick-audio-btn');
   if (quickAudioBtn) {
     quickAudioBtn.addEventListener('click', () => {
-      if (isAudioPlaying) {
-        stopAmbientSound();
-        showToast('사운드가 켜짐 해제되었습니다.', 'info');
-      } else {
-        startAmbientSound(state.sound_settings.sound_type);
-        showToast(`'${getSoundTypeName(state.sound_settings.sound_type)}' 미덕 음악이 재생됩니다.`, 'success');
+      isAudioMuted = !isAudioMuted;
+      if (currentAudioEl) {
+        currentAudioEl.muted = isAudioMuted;
       }
+      updateMuteBtnState();
+      showToast(isAudioMuted ? '미덕 음악이 음소거되었습니다.' : '음소거가 해제되었습니다.', 'info');
     });
   }
 
@@ -282,7 +299,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const soundType = chip.getAttribute('data-sound');
       state.sound_settings.sound_type = soundType;
       saveState();
-      startAmbientSound(soundType);
+
+      if (isAudioPlaying) {
+        // 재생 중이면 그 자리에서 바로 새 곡으로 전환
+        startAmbientSound(soundType);
+      } else if (currentAudioEl) {
+        // 일시정지 중이면 이전 곡은 버리고, 다음에 재생 버튼을 누르면 새로 고른 곡이 재생되도록 대기
+        stopAmbientSound();
+      }
+      // 둘 다 아니면(아직 시작 전) 선택만 바뀌고 소리는 나지 않음
     });
   });
 
@@ -312,20 +337,40 @@ document.addEventListener('DOMContentLoaded', () => {
     timerRing.style.strokeDashoffset = offset;
   }
 
+  // 시작/일시정지/이어듣기를 하나의 토글 버튼으로 표시 — 타이머와 음악은 항상 함께 움직인다.
+  function updateSessionToggleBtn() {
+    const iconUse = document.getElementById('start-timer-icon-use');
+    const label = document.getElementById('start-timer-label');
+    if (!iconUse || !label) return;
+
+    if (isTimerRunning) {
+      iconUse.setAttribute('href', '#icon-pause');
+      label.textContent = '일시정지';
+    } else if (remainingSeconds > 0 && remainingSeconds < 300) {
+      iconUse.setAttribute('href', '#icon-play');
+      label.textContent = '이어듣기';
+    } else {
+      iconUse.setAttribute('href', '#icon-play');
+      label.textContent = '5분 마음 보기 시작';
+    }
+  }
+
   const startTimerBtn = document.getElementById('start-timer-btn');
-  const pauseTimerBtn = document.getElementById('pause-timer-btn');
   const resetTimerBtn = document.getElementById('reset-timer-btn');
 
   if (startTimerBtn) {
     startTimerBtn.addEventListener('click', () => {
-      if (!isTimerRunning) {
-        if (!isAudioPlaying) {
-          startAmbientSound(state.sound_settings.sound_type);
-        }
+      if (isTimerRunning) {
+        // 재생 중 → 타이머와 음악을 같은 자리에서 함께 일시정지
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        timerStatus.textContent = '일시정지됨';
+        pauseAmbientSound();
+      } else {
+        // 처음 시작 또는 이어듣기 → 타이머와 음악을 함께 재생
+        resumeAmbientSound();
         isTimerRunning = true;
         timerStatus.textContent = '마음보기 5분 진행 중...';
-        startTimerBtn.disabled = true;
-        pauseTimerBtn.disabled = false;
 
         timerInterval = setInterval(() => {
           remainingSeconds--;
@@ -335,24 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(timerInterval);
             isTimerRunning = false;
             timerStatus.textContent = '5분 마음보기 완료!';
-            startTimerBtn.disabled = false;
-            pauseTimerBtn.disabled = true;
+            updateSessionToggleBtn();
             showToast('🎉 5분 마음 보기가 완료되었습니다! 2단계로 이동하세요.', 'success');
           }
         }, 1000);
       }
-    });
-  }
-
-  if (pauseTimerBtn) {
-    pauseTimerBtn.addEventListener('click', () => {
-      if (isTimerRunning) {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        timerStatus.textContent = '일시정지됨';
-        startTimerBtn.disabled = false;
-        pauseTimerBtn.disabled = true;
-      }
+      updateSessionToggleBtn();
     });
   }
 
@@ -363,8 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
       remainingSeconds = 300;
       timerStatus.textContent = '마음 보기 준비';
       updateTimerDisplay();
-      startTimerBtn.disabled = false;
-      pauseTimerBtn.disabled = true;
+      stopAmbientSound();
+      updateSessionToggleBtn();
     });
   }
 
@@ -1842,5 +1875,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize UI & Check Welcome Modal
   updateTimerDisplay();
+  updateSessionToggleBtn();
+  updateMuteBtnState();
   updateUI();
 });
