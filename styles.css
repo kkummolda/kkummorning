@@ -667,6 +667,22 @@ body {
   gap: 10px;
 }
 
+/* STEP 2: "이 콘텐츠는 예시입니다" 안내 배지 (미커스터마이징 상태에서만 노출) */
+.example-content-badge {
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 16px;
+  padding: 7px 14px;
+  border: 1px solid rgba(145, 104, 230, 0.4);
+  border-radius: var(--radius-pill);
+  background: rgba(145, 104, 230, 0.1);
+  color: var(--accent-blue-light);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* STEP 2: ONE WORD VECTOR CARDS */
 .postcard-container {
   display: grid;

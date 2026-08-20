@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
           family: '가족과 따뜻한 저녁 식사와 깊은 경청',
           society: '동료의 이야기를 먼저 끝까지 경청하기',
           soul: '하루 5분 호흡과 명상으로 평온 지키기'
-        }
+        },
+        customized: false // 아직 사용자가 직접 수정/저장하지 않은 예시 콘텐츠인지 여부
       },
       sound_settings: {
         sound_type: '경청',
@@ -89,7 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
           family: '가족과 따뜻한 저녁 식사와 깊은 경청',
           society: '동료의 이야기를 먼저 끝까지 경청하기',
           soul: '하루 5분 호흡과 명상으로 평온 지키기'
-        }
+        },
+        customized: true
       },
       sound_settings: { sound_type: '경청', volume: 0.4 },
       daily_logs: logs
@@ -727,6 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.user_profile.four_area_goals.family = document.getElementById('input-goal-family')?.value.trim() || '';
     state.user_profile.four_area_goals.society = document.getElementById('input-goal-society')?.value.trim() || '';
     state.user_profile.four_area_goals.soul = document.getElementById('input-goal-soul')?.value.trim() || '';
+    state.user_profile.customized = true;
 
     saveStateToLocalStorage();
     await saveProfileToSupabase();
@@ -1342,7 +1345,8 @@ document.addEventListener('DOMContentLoaded', () => {
         state.user_profile.four_area_goals.soul = profile.goal_soul || state.user_profile.four_area_goals.soul;
         if (profile.sound_type) state.sound_settings.sound_type = profile.sound_type;
         if (profile.volume !== null && profile.volume !== undefined) state.sound_settings.volume = profile.volume;
-        
+        state.user_profile.customized = true;
+
         updateAuthUI(currentUser);
         updateUI();
       }
@@ -1734,6 +1738,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!feedbackDateInput) return;
 
     // 1. Profile & Postcard
+    const exampleBadge = document.getElementById('example-content-badge');
+    if (exampleBadge) {
+      exampleBadge.style.display = state.user_profile.customized === false ? 'flex' : 'none';
+    }
+
     const displayName = state.user_profile.user_name || state.user_profile.user_id || 'Dreamer';
     document.getElementById('display-user-id').textContent = displayName;
     const headerUserName = document.getElementById('header-user-name');
