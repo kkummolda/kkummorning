@@ -999,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let supabaseClient = null;
   let currentSession = null;
   let currentUser = null;
-  let activeAuthTab = 'signup'; // Default to 'signup'
+  let activeAuthTab = 'signin'; // 재방문자가 많으므로 로그인을 기본값으로
 
   function updateSupabaseUI(isConnected) {
     const badge = document.getElementById('supabase-status-badge');
@@ -1671,7 +1671,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabSignin = document.getElementById('tab-signin');
   const tabSignup = document.getElementById('tab-signup');
   const nameGroup = document.getElementById('signup-name-group');
+  const confirmPasswordGroup = document.getElementById('signup-confirm-password-group');
   const submitBtn = document.getElementById('auth-submit-btn');
+  const submitIconUse = document.getElementById('auth-submit-icon-use');
+  const submitLabel = document.getElementById('auth-submit-label');
+  const passwordInput = document.getElementById('auth-password-input');
+
+  function setAuthSubmitIdleLabel() {
+    if (!submitIconUse || !submitLabel) return;
+    if (activeAuthTab === 'signin') {
+      submitIconUse.setAttribute('href', '#icon-login');
+      submitLabel.textContent = '로그인';
+    } else {
+      submitIconUse.setAttribute('href', '#icon-user-plus');
+      submitLabel.textContent = '회원가입';
+    }
+  }
 
   if (tabSignin && tabSignup) {
     tabSignin.addEventListener('click', () => {
@@ -1679,7 +1694,9 @@ document.addEventListener('DOMContentLoaded', () => {
       tabSignin.classList.add('active');
       tabSignup.classList.remove('active');
       if (nameGroup) nameGroup.style.display = 'none';
-      if (submitBtn) submitBtn.innerHTML = '<svg class="icon"><use href="#icon-login"></use></svg> 로그인';
+      if (confirmPasswordGroup) confirmPasswordGroup.style.display = 'none';
+      if (passwordInput) passwordInput.autocomplete = 'current-password';
+      setAuthSubmitIdleLabel();
     });
 
     tabSignup.addEventListener('click', () => {
@@ -1687,7 +1704,21 @@ document.addEventListener('DOMContentLoaded', () => {
       tabSignup.classList.add('active');
       tabSignin.classList.remove('active');
       if (nameGroup) nameGroup.style.display = 'block';
-      if (submitBtn) submitBtn.innerHTML = '<svg class="icon"><use href="#icon-user-plus"></use></svg> 회원가입';
+      if (confirmPasswordGroup) confirmPasswordGroup.style.display = 'block';
+      if (passwordInput) passwordInput.autocomplete = 'new-password';
+      setAuthSubmitIdleLabel();
+    });
+  }
+
+  // 비밀번호 표시/숨기기 눈 아이콘 토글
+  const passwordToggleBtn = document.getElementById('auth-password-toggle-btn');
+  if (passwordToggleBtn && passwordInput) {
+    passwordToggleBtn.addEventListener('click', () => {
+      const nowVisible = passwordInput.type === 'text';
+      passwordInput.type = nowVisible ? 'password' : 'text';
+      passwordToggleBtn.innerHTML = nowVisible
+        ? '<svg class="icon"><use href="#icon-eye"></use></svg>'
+        : '<svg class="icon"><use href="#icon-eye-off"></use></svg>';
     });
   }
 
@@ -1705,11 +1736,29 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    if (activeAuthTab === 'signup') {
+      const confirmPassword = document.getElementById('auth-confirm-password-input')?.value.trim();
+      if (password !== confirmPassword) {
+        showToast('비밀번호가 일치하지 않습니다. 다시 확인해 주세요.', 'error');
+        return;
+      }
+    }
+
     isAuthSubmitting = true;
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitIconUse) submitIconUse.setAttribute('href', '#icon-spinner');
+    if (submitLabel) submitLabel.textContent = '처리 중...';
+    document.getElementById('auth-submit-icon')?.classList.add('icon-spin');
+
     const task = activeAuthTab === 'signin'
       ? handleSignIn(email, password)
       : handleSignUp(email, password, name);
-    Promise.resolve(task).finally(() => { isAuthSubmitting = false; });
+    Promise.resolve(task).finally(() => {
+      isAuthSubmitting = false;
+      if (submitBtn) submitBtn.disabled = false;
+      document.getElementById('auth-submit-icon')?.classList.remove('icon-spin');
+      setAuthSubmitIdleLabel();
+    });
   };
 
   const logoutIcon = document.getElementById('header-logout-icon');
