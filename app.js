@@ -1228,7 +1228,8 @@ document.addEventListener('DOMContentLoaded', () => {
         password,
         options: {
           data: {
-            user_name: userName || email.split('@')[0]
+            user_name: userName || email.split('@')[0],
+            full_name: userName || email.split('@')[0]
           }
         }
       });
