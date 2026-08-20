@@ -1483,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveStateToLocalStorage();
     } catch (err) {
       console.error('Save profile to Supabase error:', err);
-      showToast('저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+      showToast(`클라우드 동기화 실패 (기기에는 저장됨): ${err.message || err.code || '알 수 없는 오류'}`, 'error');
     }
   }
 
@@ -1517,7 +1517,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveStateToLocalStorage();
     } catch (err) {
       console.error('Save daily log to Supabase error:', err);
-      showToast('플래너 저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+      showToast(`클라우드 동기화 실패 (기기에는 저장됨): ${err.message || err.code || '알 수 없는 오류'}`, 'error');
     }
   }
 
