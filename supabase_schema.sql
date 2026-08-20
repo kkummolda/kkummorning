@@ -88,6 +88,14 @@ CREATE POLICY "Users can update own daily logs"
     ON public.daily_logs FOR UPDATE 
     USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete own daily logs" 
-    ON public.daily_logs FOR DELETE 
+CREATE POLICY "Users can delete own daily logs"
+    ON public.daily_logs FOR DELETE
     USING (auth.uid() = user_id);
+
+-- 4. 테이블 기본 권한 부여 (SQL Editor로 테이블을 만들면 Table Editor와 달리
+--    anon/authenticated 롤에 대한 기본 GRANT가 자동으로 붙지 않아 별도로 필요)
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
