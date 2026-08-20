@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       },
       sound_settings: {
-        sound_type: 'rain',
+        sound_type: '경청',
         volume: 0.4
       },
       supabase_config: {
@@ -91,12 +91,18 @@ document.addEventListener('DOMContentLoaded', () => {
           soul: '하루 5분 호흡과 명상으로 평온 지키기'
         }
       },
-      sound_settings: { sound_type: 'rain', volume: 0.4 },
+      sound_settings: { sound_type: '경청', volume: 0.4 },
       daily_logs: logs
     };
   }
 
+  // 꿈모닝 12미덕 음악 (music/ 폴더의 mp3 파일명과 일치)
+  const VIRTUE_SOUNDS = ['감사', '경청', '긍정', '믿음', '배려', '사랑', '인내', '절제', '정직', '존중', '지혜', '책임'];
+
   let state = loadState();
+  if (!state.sound_settings || !VIRTUE_SOUNDS.includes(state.sound_settings.sound_type)) {
+    state.sound_settings = { ...(state.sound_settings || {}), sound_type: '경청' };
+  }
 
   function loadState() {
     try {
@@ -178,233 +184,35 @@ document.addEventListener('DOMContentLoaded', () => {
   animateParticles();
 
   // ------------------------------------------------------------------------
-  // 3. WEB AUDIO SYNTHESIZER ENGINE (No External Files Required)
+  // 3. AUDIO ENGINE — 꿈모닝 12미덕 음악 (music/ 폴더의 mp3 파일 재생)
+  //    일반 <audio> 엘리먼트로 직접 재생한다 (Web Audio API의
+  //    createMediaElementSource는 file:// 로 열었을 때 CORS 제약으로
+  //    무음(zero-output)이 되는 브라우저 버그가 있어 사용하지 않는다).
   // ------------------------------------------------------------------------
-  let audioCtx = null;
   let isAudioPlaying = false;
-  let masterGain = null;
-  let currentSoundNodes = [];
-
-  function initAudioContext() {
-    if (!audioCtx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContext();
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = state.sound_settings.volume;
-      masterGain.connect(audioCtx.destination);
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-  }
+  let currentAudioEl = null;
 
   function startAmbientSound(type) {
-    initAudioContext();
     stopAmbientSound();
 
-    if (type === 'rain') {
-      // 1. Continuous Rain Noise Layer (Pink Noise)
-      const bufferSize = audioCtx.sampleRate * 2;
-      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        output[i] *= 0.1;
-        b6 = white * 0.115926;
-      }
+    if (!VIRTUE_SOUNDS.includes(type)) type = '경청';
 
-      const rainSource = audioCtx.createBufferSource();
-      rainSource.buffer = noiseBuffer;
-      rainSource.loop = true;
+    currentAudioEl = new Audio(`music/${encodeURIComponent(type)}.mp3`);
+    currentAudioEl.loop = true;
+    currentAudioEl.volume = state.sound_settings.volume;
 
-      const rainFilter = audioCtx.createBiquadFilter();
-      rainFilter.type = 'lowpass';
-      rainFilter.frequency.value = 1400;
-
-      rainSource.connect(rainFilter);
-      rainFilter.connect(masterGain);
-      rainSource.start();
-
-      // 2. Random Raindrop Clicks Generator
-      const dropInterval = setInterval(() => {
-        if (!isAudioPlaying) return;
-        const dropOsc = audioCtx.createOscillator();
-        const dropGain = audioCtx.createGain();
-        dropOsc.type = 'sine';
-        const dropFreq = 2000 + Math.random() * 3000;
-        dropOsc.frequency.setValueAtTime(dropFreq, audioCtx.currentTime);
-        dropGain.gain.setValueAtTime(0.015 + Math.random() * 0.02, audioCtx.currentTime);
-        dropGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.03);
-
-        dropOsc.connect(dropGain);
-        dropGain.connect(masterGain);
-        dropOsc.start();
-        dropOsc.stop(audioCtx.currentTime + 0.035);
-      }, 100);
-
-      currentSoundNodes.push(rainSource, { stop: () => clearInterval(dropInterval) });
-
-    } else if (type === 'forest') {
-      // 1. Modulated Forest Wind Sweep
-      const bufferSize = audioCtx.sampleRate * 2;
-      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = (Math.random() * 2 - 1) * 0.08;
-      }
-
-      const windNoise = audioCtx.createBufferSource();
-      windNoise.buffer = noiseBuffer;
-      windNoise.loop = true;
-
-      const windFilter = audioCtx.createBiquadFilter();
-      windFilter.type = 'bandpass';
-      windFilter.Q.value = 2.0;
-      windFilter.frequency.setValueAtTime(450, audioCtx.currentTime);
-
-      // LFO for natural wind frequency swells
-      const lfo = audioCtx.createOscillator();
-      lfo.frequency.value = 0.15; // Slow breeze pulse
-      const lfoGain = audioCtx.createGain();
-      lfoGain.gain.value = 250;
-      lfo.connect(windFilter.frequency);
-
-      windNoise.connect(windFilter);
-      windFilter.connect(masterGain);
-
-      windNoise.start();
-      lfo.start();
-
-      // 2. Warm Ambient Synth Pad (A2 / E3 / A3)
-      const padFreqs = [110, 164.81, 220];
-      const padGain = audioCtx.createGain();
-      padGain.gain.value = 0.04;
-      const padOscs = padFreqs.map(f => {
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = f;
-        osc.connect(padGain);
-        osc.start();
-        return osc;
-      });
-      padGain.connect(masterGain);
-
-      currentSoundNodes.push(windNoise, lfo, padGain, ...padOscs);
-
-    } else if (type === 'musicbox') {
-      // 432Hz Sacred Frequency Meditation Music Box with Delay Echo
-      const delay = audioCtx.createDelay();
-      delay.delayTime.value = 0.38;
-      const feedback = audioCtx.createGain();
-      feedback.gain.value = 0.35;
-      delay.connect(feedback);
-      feedback.connect(delay);
-      delay.connect(masterGain);
-
-      const scale = [216, 270, 324, 432, 540, 648, 864]; // 432Hz A-major pentatonic scale
-      let step = 0;
-
-      const musicInterval = setInterval(() => {
-        if (!isAudioPlaying) {
-          clearInterval(musicInterval);
-          return;
-        }
-        const freq = scale[step % scale.length];
-        step = (step + Math.floor(Math.random() * 3) + 1) % scale.length;
-
-        // Dual Oscillator: Sine (fundamental) + Triangle (bell overtone)
-        const osc1 = audioCtx.createOscillator();
-        const osc2 = audioCtx.createOscillator();
-        const noteGain = audioCtx.createGain();
-
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(freq * 2, audioCtx.currentTime);
-
-        const now = audioCtx.currentTime;
-        noteGain.gain.setValueAtTime(0.001, now);
-        noteGain.gain.linearRampToValueAtTime(0.12, now + 0.015); // Fast attack
-        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.0); // Long music box ring
-
-        osc1.connect(noteGain);
-        osc2.connect(noteGain);
-        noteGain.connect(masterGain);
-        noteGain.connect(delay);
-
-        osc1.start(now);
-        osc2.start(now);
-        osc1.stop(now + 3.1);
-        osc2.stop(now + 3.1);
-      }, 1000);
-
-      currentSoundNodes.push({ stop: () => clearInterval(musicInterval) }, delay, feedback);
-
-    } else if (type === 'fire') {
-      // 1. Warm Fire Deep Ember Rumble
-      const osc = audioCtx.createOscillator();
-      const oscGain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.value = 75; // Low warmth D2
-      oscGain.gain.value = 0.08;
-      osc.connect(oscGain);
-      oscGain.connect(masterGain);
-      osc.start();
-
-      // 2. Wood Crackle & Pop Impulses
-      const crackleInterval = setInterval(() => {
-        if (!isAudioPlaying) return;
-
-        // Random chance for crackle pop
-        if (Math.random() < 0.65) {
-          const bufferSize = audioCtx.sampleRate * 0.02; // 20ms burst
-          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-          const data = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
-          }
-
-          const noise = audioCtx.createBufferSource();
-          noise.buffer = buffer;
-
-          const filter = audioCtx.createBiquadFilter();
-          filter.type = 'highpass';
-          filter.frequency.value = 1200 + Math.random() * 2500;
-
-          const crackleGain = audioCtx.createGain();
-          crackleGain.gain.value = 0.03 + Math.random() * 0.08;
-
-          noise.connect(filter);
-          filter.connect(crackleGain);
-          crackleGain.connect(masterGain);
-
-          noise.start();
-        }
-      }, 120);
-
-      currentSoundNodes.push(osc, oscGain, { stop: () => clearInterval(crackleInterval) });
-    }
+    currentAudioEl.play().catch(err => console.warn('미덕 음악 재생 실패:', err));
 
     isAudioPlaying = true;
     updateAudioBtnState();
   }
 
   function stopAmbientSound() {
-    currentSoundNodes.forEach(node => {
-      try {
-        if (node.stop) node.stop();
-        if (node.disconnect) node.disconnect();
-      } catch (e) {}
-    });
-    currentSoundNodes = [];
+    if (currentAudioEl) {
+      currentAudioEl.pause();
+      currentAudioEl.currentTime = 0;
+      currentAudioEl = null;
+    }
     isAudioPlaying = false;
     updateAudioBtnState();
   }
@@ -429,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('사운드가 켜짐 해제되었습니다.', 'info');
       } else {
         startAmbientSound(state.sound_settings.sound_type);
-        showToast(`${getSoundTypeName(state.sound_settings.sound_type)} 사운드가 재생됩니다.`, 'success');
+        showToast(`'${getSoundTypeName(state.sound_settings.sound_type)}' 미덕 음악이 재생됩니다.`, 'success');
       }
     });
   }
@@ -439,8 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
     volumeSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
       state.sound_settings.volume = val;
-      if (masterGain) {
-        masterGain.gain.value = val;
+      if (currentAudioEl) {
+        currentAudioEl.volume = val;
       }
       saveState();
     });
@@ -458,13 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function getSoundTypeName(type) {
-    const map = {
-      rain: '차분한 밤 빗소리',
-      forest: '숲속의 아늑한 바람',
-      musicbox: '432Hz 명상 오르골',
-      fire: '따뜻한 모닥불 장작'
-    };
-    return map[type] || '명상음';
+    return VIRTUE_SOUNDS.includes(type) ? type : '경청';
   }
 
   // ------------------------------------------------------------------------
@@ -496,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (startTimerBtn) {
     startTimerBtn.addEventListener('click', () => {
       if (!isTimerRunning) {
-        initAudioContext();
         if (!isAudioPlaying) {
           startAmbientSound(state.sound_settings.sound_type);
         }
@@ -698,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearTimeout(autosaveTimer);
     autosaveTimer = setTimeout(() => {
-      indicator.style.color = '#10b981';
+      indicator.style.color = '#9168e6';
       indicator.innerHTML = '<svg class="icon"><use href="#icon-check"></use></svg> 자동 임시 저장됨';
     }, 800);
   }
@@ -1423,7 +1224,7 @@ document.addEventListener('DOMContentLoaded', () => {
           goal_family: state.user_profile.four_area_goals?.family || '',
           goal_society: state.user_profile.four_area_goals?.society || '',
           goal_soul: state.user_profile.four_area_goals?.soul || '',
-          sound_type: state.sound_settings?.sound_type || 'rain',
+          sound_type: state.sound_settings?.sound_type || '경청',
           volume: state.sound_settings?.volume || 0.4,
           updated_at: new Date().toISOString()
         };
@@ -1702,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             goal_family: localData.user_profile.four_area_goals?.family || '',
             goal_society: localData.user_profile.four_area_goals?.society || '',
             goal_soul: localData.user_profile.four_area_goals?.soul || '',
-            sound_type: localData.sound_settings?.sound_type || 'rain',
+            sound_type: localData.sound_settings?.sound_type || '경청',
             volume: localData.sound_settings?.volume || 0.4,
             updated_at: new Date().toISOString()
           };
@@ -1882,7 +1683,7 @@ document.addEventListener('DOMContentLoaded', () => {
       p.style.top = '-10px';
       p.style.width = '10px';
       p.style.height = '10px';
-      p.style.backgroundColor = ['#0123b4', '#16a866', '#ff5a5f', '#fbbf24'][Math.floor(Math.random() * 4)];
+      p.style.backgroundColor = ['#9168e6', '#b794f6', '#b5a0f2', '#fbbf24'][Math.floor(Math.random() * 4)];
       p.style.zIndex = '9999';
       p.style.borderRadius = '50%';
       p.style.pointerEvents = 'none';
@@ -1964,7 +1765,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lockBadge) {
       if (completedCount >= 21) {
         lockBadge.textContent = '🎉 (완성)';
-        lockBadge.style.color = '#34d399';
+        lockBadge.style.color = '#9168e6';
       } else {
         lockBadge.textContent = `(${completedCount}/21일)`;
         lockBadge.style.color = 'var(--text-muted)';

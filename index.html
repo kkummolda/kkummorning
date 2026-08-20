@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>꿈모닝 - 진짜 나를 만나는 시간, 자기 전 5분</title>
   <meta name="description" content="진짜 나를 만나는 시간, 자기 전 5분. 자아·가정·사회·영혼 4가지 영역을 돌아보며 온전히 나다운 삶을 가꾸는 21일 회고 서비스입니다.">
-  <meta name="theme-color" content="#12132b">
+  <meta name="theme-color" content="#182052">
   <link rel="icon" type="image/png" href="favicon.png">
   <!-- Mobile Smartphone & PWA Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -98,7 +98,7 @@
 
       <!-- Right Customer Actions -->
       <div class="header-status">
-        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="padding: 5px 12px; font-size: 0.82rem; border-color: var(--accent-blue); color: var(--accent-blue); cursor: pointer;">
+        <button class="btn btn-outline btn-sm" id="open-auth-modal-btn" onclick="openAuthModal()" style="height: 32px; padding: 0 14px; box-sizing: border-box; font-size: 13px; line-height: 1; border-color: rgba(255, 255, 255, 0.7); color: #ffffff; cursor: pointer;">
           <svg class="icon"><use href="#icon-login"></use></svg> 로그인 / 가입
         </button>
         <div class="user-profile-pill" id="header-user-profile" title="프로필 관리 및 로그아웃" style="display: none; align-items: center; gap: 6px; background: var(--bg-card-secondary); border: 1px solid var(--border-subtle); padding: 5px 12px; border-radius: var(--radius-pill); font-size: 13px; cursor: pointer; color: var(--accent-blue);">
@@ -156,23 +156,43 @@
 
             <!-- Sound Controls -->
             <div class="sound-controls-card">
-              <h3><svg class="icon"><use href="#icon-music"></use></svg> 힐링 미덕 사운드 선택</h3>
+              <h3><svg class="icon"><use href="#icon-music"></use></svg> 꿈모닝 12미덕 음악 선택</h3>
               <div class="sound-preset-grid">
-                <button class="sound-chip active" data-sound="rain">
-                  <svg class="icon chip-icon"><use href="#icon-rain"></use></svg>
-                  <span class="chip-title">차분한 밤 빗소리</span>
+                <button class="sound-chip active" data-sound="경청">
+                  <span class="chip-title">경청</span>
                 </button>
-                <button class="sound-chip" data-sound="forest">
-                  <svg class="icon chip-icon"><use href="#icon-tree"></use></svg>
-                  <span class="chip-title">숲속의 아늑한 바람</span>
+                <button class="sound-chip" data-sound="감사">
+                  <span class="chip-title">감사</span>
                 </button>
-                <button class="sound-chip" data-sound="musicbox">
-                  <svg class="icon chip-icon"><use href="#icon-orb"></use></svg>
-                  <span class="chip-title">432Hz 명상 오르골</span>
+                <button class="sound-chip" data-sound="긍정">
+                  <span class="chip-title">긍정</span>
                 </button>
-                <button class="sound-chip" data-sound="fire">
-                  <svg class="icon chip-icon"><use href="#icon-fire"></use></svg>
-                  <span class="chip-title">따뜻한 모닥불 장작</span>
+                <button class="sound-chip" data-sound="믿음">
+                  <span class="chip-title">믿음</span>
+                </button>
+                <button class="sound-chip" data-sound="배려">
+                  <span class="chip-title">배려</span>
+                </button>
+                <button class="sound-chip" data-sound="사랑">
+                  <span class="chip-title">사랑</span>
+                </button>
+                <button class="sound-chip" data-sound="인내">
+                  <span class="chip-title">인내</span>
+                </button>
+                <button class="sound-chip" data-sound="절제">
+                  <span class="chip-title">절제</span>
+                </button>
+                <button class="sound-chip" data-sound="정직">
+                  <span class="chip-title">정직</span>
+                </button>
+                <button class="sound-chip" data-sound="존중">
+                  <span class="chip-title">존중</span>
+                </button>
+                <button class="sound-chip" data-sound="지혜">
+                  <span class="chip-title">지혜</span>
+                </button>
+                <button class="sound-chip" data-sound="책임">
+                  <span class="chip-title">책임</span>
                 </button>
               </div>
 
@@ -435,11 +455,11 @@
     <!-- FOOTER -->
     <footer style="margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border-hairline); text-align: center; color: var(--text-muted); font-size: 0.85rem;">
       <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap;">
-        <a href="index.html" style="color: var(--area-soul); text-decoration: none;"><svg class="icon"><use href="#icon-home"></use></svg> 꿈모닝 메인</a>
+        <a href="index.html" style="color: var(--text-main); text-decoration: none;"><svg class="icon"><use href="#icon-home"></use></svg> 꿈모닝 메인</a>
         <span>•</span>
-        <a href="auth.html" style="color: var(--area-family); text-decoration: none;"><svg class="icon"><use href="#icon-shield-user"></use></svg> 계정</a>
+        <a href="auth.html" style="color: var(--text-main); text-decoration: none;"><svg class="icon"><use href="#icon-shield-user"></use></svg> 마이 계정</a>
       </div>
-      <p>© 2026 꿈모닝 5분 피드백 (Dream Morning) — 21-Day Mindfulness Service</p>
+      <p>© 2026 꿈모닝 피드백 플래너 (kkummorning feedback planner)</p>
     </footer>
   </div>
 
@@ -600,7 +620,7 @@
           <input type="file" id="import-json-file" accept=".json" style="display: none;">
         </div>
 
-        <button type="button" class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; color: var(--area-soul); border-color: rgba(22, 168, 102, 0.35);">
+        <button type="button" class="btn btn-outline" id="start-new-challenge-btn" style="width: 100%; color: var(--area-soul); border-color: rgba(145, 104, 230, 0.35);">
           <svg class="icon"><use href="#icon-flag"></use></svg> 새 21일 챌린지 시작 (초기화)
         </button>
       </div>
@@ -608,7 +628,7 @@
   </div>
 
   <!-- GLOBAL LOADING OVERLAY -->
-  <div id="global-loading-overlay" style="position: fixed; inset: 0; background: rgba(11, 14, 23, 0.85); backdrop-filter: blur(10px); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: #fff;">
+  <div id="global-loading-overlay" style="position: fixed; inset: 0; background: rgba(17, 23, 53, 0.85); backdrop-filter: blur(10px); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: #fff;">
     <svg class="icon icon-spin" style="font-size: 2.5rem; color: var(--accent-blue);"><use href="#icon-spinner"></use></svg>
     <span id="global-loading-text" style="font-size: 1rem; font-weight: 500;">처리 중입니다...</span>
   </div>
