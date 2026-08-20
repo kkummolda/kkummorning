@@ -1001,26 +1001,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentUser = null;
   let activeAuthTab = 'signup'; // Default to 'signup'
 
-  window.submitAuthForm = function() {
-    const email = document.getElementById('auth-email-input').value.trim();
-    const password = document.getElementById('auth-password-input').value.trim();
-    const name = document.getElementById('auth-name-input')?.value.trim();
-
-    if (!email || !password) {
-      showToast('이메일과 비밀번호(6자 이상)를 입력해 주세요.', 'error');
-      return;
-    }
-
-    const nameGroup = document.getElementById('signup-name-group');
-    const isSignupVisible = nameGroup && (nameGroup.style.display === 'block' || nameGroup.style.display === '');
-
-    if (activeAuthTab === 'signup' || isSignupVisible) {
-      handleSignUp(email, password, name);
-    } else {
-      handleSignIn(email, password);
-    }
-  };
-
   function updateSupabaseUI(isConnected) {
     const badge = document.getElementById('supabase-status-badge');
     const syncBtn = document.getElementById('manual-sync-supabase-btn');
@@ -1321,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Sign up error:', err);
-      showToast(`가입/로그인 안내: ${formatAuthErrorMessage(err.message)}`, 'error');
+      showToast(`가입/로그인 안내: ${err.message || '잠시 후 다시 시도해 주세요.'}`, 'error');
     } finally {
       hideGlobalLoading();
     }
@@ -1706,10 +1686,6 @@ document.addEventListener('DOMContentLoaded', () => {
       handleSignUp(email, password, name);
     }
   };
-
-  if (submitBtn) {
-    submitBtn.addEventListener('click', window.submitAuthForm);
-  }
 
   const logoutIcon = document.getElementById('header-logout-icon');
   if (logoutIcon) logoutIcon.addEventListener('click', (e) => {
