@@ -1386,7 +1386,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Fetch profile error:', pErr);
       } else if (profile) {
         state.user_profile.user_id = profile.user_id;
-        state.user_profile.user_name = profile.user_name || currentUser.user_metadata?.user_name || currentUser.email?.split('@')[0];
+        state.user_profile.user_name = (profile.user_name && !isUUID(profile.user_name) ? profile.user_name : null)
+          || currentUser.user_metadata?.user_name
+          || currentUser.email?.split('@')[0];
         state.user_profile.user_email = profile.email || currentUser.email;
         state.user_profile.one_word = profile.oneword || state.user_profile.one_word;
         state.user_profile.one_word_quote = profile.oneword_quote || state.user_profile.one_word_quote;
@@ -1793,7 +1795,10 @@ document.addEventListener('DOMContentLoaded', () => {
       exampleBadge.style.display = isExampleProfileContent(state.user_profile) ? 'flex' : 'none';
     }
 
-    const displayName = state.user_profile.user_name || state.user_profile.user_id || 'Dreamer';
+    let displayName = state.user_profile.user_name;
+    if (!displayName || isUUID(displayName)) {
+      displayName = currentUser?.user_metadata?.user_name || currentUser?.email?.split('@')[0] || 'Dreamer';
+    }
     document.getElementById('display-user-id').textContent = displayName;
     const headerUserName = document.getElementById('header-user-name');
     if (headerUserName) {
