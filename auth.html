@@ -101,7 +101,31 @@
         <h2 class="chronos-banner-title">내 계정을 관리하세요</h2>
         <p class="chronos-banner-desc">로그인하면 기록이 클라우드에 자동 저장되어 여러 기기에서 이어서 사용할 수 있어요.</p>
 
-        <div style="max-width: 420px; margin-top: 20px;">
+        <!-- Account Info Card (shown when already logged in) -->
+        <div id="account-info-card" style="max-width: 420px; margin-top: 20px; display: none;">
+          <div class="sound-controls-card">
+            <h3 style="margin-bottom: 14px; font-size: 1.1rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+              <svg class="icon" style="color: var(--accent-blue);"><use href="#icon-user"></use></svg> 내 계정 정보
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">닉네임</label>
+                <div id="account-info-name" style="font-size: 1rem; color: var(--text-main); font-weight: 600;">-</div>
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 4px;">이메일</label>
+                <div id="account-info-email" style="font-size: 1rem; color: var(--text-main);">-</div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline" id="account-logout-btn" style="width: 100%; justify-content: center; padding: 12px; cursor: pointer;">
+              <svg class="icon"><use href="#icon-logout"></use></svg> 로그아웃
+            </button>
+          </div>
+        </div>
+
+        <div id="auth-form-card" style="max-width: 420px; margin-top: 20px;">
           <!-- Auth Form Card -->
           <div class="sound-controls-card">
             <h3 style="margin-bottom: 14px; font-size: 1.1rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">

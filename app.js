@@ -1150,11 +1150,30 @@ document.addEventListener('DOMContentLoaded', () => {
       if (headerUserName) headerUserName.textContent = displayName;
       const displayUserId = document.getElementById('display-user-id');
       if (displayUserId) displayUserId.textContent = displayName;
+
+      // auth.html: 로그인 상태면 가입/로그인 폼 대신 계정 정보 카드를 보여준다
+      const authFormCard = document.getElementById('auth-form-card');
+      const accountInfoCard = document.getElementById('account-info-card');
+      if (authFormCard && accountInfoCard) {
+        authFormCard.style.display = 'none';
+        accountInfoCard.style.display = 'block';
+        const accountName = document.getElementById('account-info-name');
+        const accountEmail = document.getElementById('account-info-email');
+        if (accountName) accountName.textContent = displayName;
+        if (accountEmail) accountEmail.textContent = user.email || '-';
+      }
     } else {
       if (authBtn) authBtn.style.display = 'inline-flex';
       if (profilePill) profilePill.style.display = 'none';
       const displayUserId = document.getElementById('display-user-id');
       if (displayUserId) displayUserId.textContent = 'Guest (로그인 필요)';
+
+      const authFormCard = document.getElementById('auth-form-card');
+      const accountInfoCard = document.getElementById('account-info-card');
+      if (authFormCard && accountInfoCard) {
+        authFormCard.style.display = 'block';
+        accountInfoCard.style.display = 'none';
+      }
     }
   }
 
@@ -1697,6 +1716,9 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     handleSignOut();
   });
+
+  const accountLogoutBtn = document.getElementById('account-logout-btn');
+  if (accountLogoutBtn) accountLogoutBtn.addEventListener('click', handleSignOut);
 
   const forgotPasswordLink = document.getElementById('forgot-password-link');
   if (forgotPasswordLink) forgotPasswordLink.addEventListener('click', () => {
