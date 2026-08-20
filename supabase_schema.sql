@@ -39,6 +39,11 @@ CREATE TABLE IF NOT EXISTS public.daily_logs (
     CONSTRAINT unique_user_date UNIQUE (user_id, date)
 );
 
+-- 1-1. 기존 테이블에 누락된 컬럼 보정 (CREATE TABLE IF NOT EXISTS는 이미
+--      존재하는 테이블의 컬럼을 추가/변경하지 않으므로 별도로 필요)
+ALTER TABLE public.user_profiles ADD COLUMN IF NOT EXISTS email TEXT DEFAULT '';
+ALTER TABLE public.daily_logs ADD COLUMN IF NOT EXISTS user_name TEXT DEFAULT 'Dreamer';
+
 -- 2. 인덱스 생성 (조회 성능 최적화)
 CREATE INDEX IF NOT EXISTS idx_user_profiles_user_id ON public.user_profiles(user_id);
 CREATE INDEX IF NOT EXISTS idx_daily_logs_user_date ON public.daily_logs(user_id, date);
