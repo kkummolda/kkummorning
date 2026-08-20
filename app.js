@@ -1157,6 +1157,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Supabase 인증 에러 메시지를 사용자가 이해하기 쉬운 한국어 안내로 변환
+  function formatAuthErrorMessage(message) {
+    const msg = String(message || '').toLowerCase();
+    if (msg.includes('invalid login credentials')) {
+      return '이메일 또는 비밀번호가 일치하지 않습니다. 다시 확인해 주세요.';
+    }
+    if (msg.includes('email not confirmed')) {
+      return '이메일 인증이 아직 완료되지 않았습니다. 받으신 인증 메일을 확인해 주세요.';
+    }
+    if (msg.includes('already registered')) {
+      return '이미 가입된 이메일입니다. [로그인] 탭에서 로그인해 주세요.';
+    }
+    if (msg.includes('password') && msg.includes('6 character')) {
+      return '비밀번호는 6자 이상이어야 합니다.';
+    }
+    if (msg.includes('rate limit')) {
+      return '요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.';
+    }
+    return message || '알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+  }
+
   // Auth Operations: Sign In, Sign Up, Sign Out
   async function handleSignIn(email, password) {
     if (!supabaseClient) {
@@ -1188,7 +1209,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tab1Btn) tab1Btn.click();
     } catch (err) {
       console.error('Sign in error:', err);
-      showToast(`로그인 안내: ${err.message || '이메일 또는 비밀번호를 확인해주세요.'}`, 'error');
+      showToast(`로그인 안내: ${formatAuthErrorMessage(err.message)}`, 'error');
     } finally {
       hideGlobalLoading();
     }
@@ -1301,7 +1322,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Sign up error:', err);
-      showToast(`가입/로그인 안내: ${err.message || '잠시 후 다시 시도해 주세요.'}`, 'error');
+      showToast(`가입/로그인 안내: ${formatAuthErrorMessage(err.message)}`, 'error');
     } finally {
       hideGlobalLoading();
     }
@@ -1670,7 +1691,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  let isAuthSubmitting = false;
+
   window.submitAuthForm = function() {
+    if (isAuthSubmitting) return; // 요청이 처리되는 동안 중복 클릭으로 두 번 전송되는 것을 방지
+
     const email = document.getElementById('auth-email-input').value.trim();
     const password = document.getElementById('auth-password-input').value.trim();
     const name = document.getElementById('auth-name-input')?.value.trim();
@@ -1680,11 +1705,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (activeAuthTab === 'signin') {
-      handleSignIn(email, password);
-    } else {
-      handleSignUp(email, password, name);
-    }
+    isAuthSubmitting = true;
+    const task = activeAuthTab === 'signin'
+      ? handleSignIn(email, password)
+      : handleSignUp(email, password, name);
+    Promise.resolve(task).finally(() => { isAuthSubmitting = false; });
   };
 
   const logoutIcon = document.getElementById('header-logout-icon');
