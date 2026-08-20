@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${year}-${month}-${day}`;
   }
 
+  // 신규 방문자에게 보여주는 예시 원워드/4영역 다짐 (아래 DEFAULT_PROFILE_CONTENT와 동일하게 유지)
   function createDefaultState() {
     return {
       user_profile: {
@@ -44,8 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
           family: '가족과 따뜻한 저녁 식사와 깊은 경청',
           society: '동료의 이야기를 먼저 끝까지 경청하기',
           soul: '하루 5분 호흡과 명상으로 평온 지키기'
-        },
-        customized: false // 아직 사용자가 직접 수정/저장하지 않은 예시 콘텐츠인지 여부
+        }
       },
       sound_settings: {
         sound_type: '경청',
@@ -90,8 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
           family: '가족과 따뜻한 저녁 식사와 깊은 경청',
           society: '동료의 이야기를 먼저 끝까지 경청하기',
           soul: '하루 5분 호흡과 명상으로 평온 지키기'
-        },
-        customized: true
+        }
       },
       sound_settings: { sound_type: '경청', volume: 0.4 },
       daily_logs: logs
@@ -100,6 +99,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 꿈모닝 12미덕 음악 (music/ 폴더의 mp3 파일명과 일치)
   const VIRTUE_SOUNDS = ['감사', '경청', '긍정', '믿음', '배려', '사랑', '인내', '절제', '정직', '존중', '지혜', '책임'];
+
+  // createDefaultState()의 원워드/4영역 다짐과 동일한 값 — 아직 손대지 않은
+  // "예시" 콘텐츠인지 판별할 때 기준으로 사용한다 (customized 플래그 대신 내용을
+  // 직접 비교해야, 이 기능이 추가되기 전에 이미 저장된 로컬 데이터도 올바르게 예시로 인식된다)
+  const DEFAULT_PROFILE_CONTENT = {
+    one_word_quote: '타인의 소리와 내 영혼의 소리에 귀 기울이는 삶',
+    self: '매일 30분 독서 및 온전한 생각 정리',
+    family: '가족과 따뜻한 저녁 식사와 깊은 경청',
+    society: '동료의 이야기를 먼저 끝까지 경청하기',
+    soul: '하루 5분 호흡과 명상으로 평온 지키기'
+  };
+
+  function isExampleProfileContent(profile) {
+    return !profile.user_name &&
+      profile.one_word_quote === DEFAULT_PROFILE_CONTENT.one_word_quote &&
+      profile.four_area_goals.self === DEFAULT_PROFILE_CONTENT.self &&
+      profile.four_area_goals.family === DEFAULT_PROFILE_CONTENT.family &&
+      profile.four_area_goals.society === DEFAULT_PROFILE_CONTENT.society &&
+      profile.four_area_goals.soul === DEFAULT_PROFILE_CONTENT.soul;
+  }
 
   let state = loadState();
   if (!state.sound_settings || !VIRTUE_SOUNDS.includes(state.sound_settings.sound_type)) {
@@ -729,7 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
     state.user_profile.four_area_goals.family = document.getElementById('input-goal-family')?.value.trim() || '';
     state.user_profile.four_area_goals.society = document.getElementById('input-goal-society')?.value.trim() || '';
     state.user_profile.four_area_goals.soul = document.getElementById('input-goal-soul')?.value.trim() || '';
-    state.user_profile.customized = true;
 
     saveStateToLocalStorage();
     await saveProfileToSupabase();
@@ -1345,7 +1363,6 @@ document.addEventListener('DOMContentLoaded', () => {
         state.user_profile.four_area_goals.soul = profile.goal_soul || state.user_profile.four_area_goals.soul;
         if (profile.sound_type) state.sound_settings.sound_type = profile.sound_type;
         if (profile.volume !== null && profile.volume !== undefined) state.sound_settings.volume = profile.volume;
-        state.user_profile.customized = true;
 
         updateAuthUI(currentUser);
         updateUI();
@@ -1740,7 +1757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Profile & Postcard
     const exampleBadge = document.getElementById('example-content-badge');
     if (exampleBadge) {
-      exampleBadge.style.display = state.user_profile.customized === false ? 'flex' : 'none';
+      exampleBadge.style.display = isExampleProfileContent(state.user_profile) ? 'flex' : 'none';
     }
 
     const displayName = state.user_profile.user_name || state.user_profile.user_id || 'Dreamer';
