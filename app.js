@@ -1779,6 +1779,12 @@ document.addEventListener('DOMContentLoaded', () => {
     handleSignOut();
   });
 
+  // 프로필 알약을 클릭하면 마이 계정으로 이동 (로그아웃 아이콘 클릭은 위에서 stopPropagation으로 걸러짐)
+  const headerProfilePill = document.getElementById('header-user-profile');
+  if (headerProfilePill) headerProfilePill.addEventListener('click', () => {
+    window.location.href = 'auth.html';
+  });
+
   const accountLogoutBtn = document.getElementById('account-logout-btn');
   if (accountLogoutBtn) accountLogoutBtn.addEventListener('click', handleSignOut);
 
