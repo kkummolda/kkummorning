@@ -1165,6 +1165,27 @@ body {
   background: var(--bg-card);
 }
 
+/* 사용자가 이미 내용을 작성한 항목을 한눈에 구분하기 위한 표시 */
+.field-filled-check {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: rgba(145, 104, 230, 0.18);
+  color: var(--accent-blue);
+  font-size: 0.7rem;
+}
+
+.feedback-field-card.has-content .field-filled-check {
+  display: inline-flex;
+}
+
+.feedback-field-card.has-content .chronos-textarea {
+  border-color: rgba(145, 104, 230, 0.4);
+}
+
 .summary-field-wrapper {
   background: var(--bg-card);
   border: 1px solid var(--border-hairline);
