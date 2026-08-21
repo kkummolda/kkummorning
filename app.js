@@ -1872,7 +1872,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!displayName || isUUID(displayName)) {
       displayName = currentUser?.user_metadata?.user_name || currentUser?.email?.split('@')[0] || 'Dreamer';
     }
-    document.getElementById('display-user-id').textContent = displayName;
+    const displayUserIdEl = document.getElementById('display-user-id');
+    if (displayUserIdEl) displayUserIdEl.textContent = displayName;
     const headerUserName = document.getElementById('header-user-name');
     if (headerUserName) {
       headerUserName.textContent = displayName;

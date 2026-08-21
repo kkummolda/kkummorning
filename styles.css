@@ -709,14 +709,6 @@ body {
   border-color: rgba(145, 104, 230, 0.4);
 }
 
-.postcard-header {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-}
-
 .postcard-body {
   text-align: center;
   margin: 16px 0;
@@ -797,26 +789,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.vector-card-title {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-main);
   margin-bottom: 10px;
+}
+
+.vector-card-header > span {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.vector-card.card-self .vector-card-title .icon { color: var(--area-self); }
-.vector-card.card-family .vector-card-title .icon { color: var(--area-family); }
-.vector-card.card-society .vector-card-title .icon { color: var(--area-society); }
-.vector-card.card-soul .vector-card-title .icon { color: var(--area-soul); }
+.vector-card.card-self .vector-card-header .icon { color: var(--area-self); }
+.vector-card.card-family .vector-card-header .icon { color: var(--area-family); }
+.vector-card.card-society .vector-card-header .icon { color: var(--area-society); }
+.vector-card.card-soul .vector-card-header .icon { color: var(--area-soul); }
 
 .card-edit-btn {
   background: var(--bg-card-secondary);

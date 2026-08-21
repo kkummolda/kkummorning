@@ -237,17 +237,12 @@
           <div class="postcard-container">
             <!-- One-Word Card -->
             <div class="oneword-postcard" id="oneword-card-element">
-              <div class="postcard-header">
-                <span class="postcard-tag">21-DAY CHALLENGE POSTCARD</span>
-                <span class="chronos-badge badge-blue">ENGAGED</span>
-              </div>
               <div class="postcard-body">
                 <div class="oneword-label">나를 이끄는 방향 단어</div>
                 <h3 class="oneword-title" id="display-oneword">" 경청 "</h3>
                 <p class="oneword-quote" id="display-oneword-quote">타인의 소리와 내 영혼의 소리에 귀 기울이는 삶</p>
               </div>
-              <div class="postcard-footer">
-                <span>작성자: <strong id="display-user-id">Dreamer</strong></span>
+              <div class="postcard-footer" style="justify-content: flex-end;">
                 <button class="btn-text-edit" id="open-edit-goals-btn">
                   <svg class="icon"><use href="#icon-pen"></use></svg> 수정
                 </button>
@@ -258,49 +253,33 @@
             <div class="goals-overview-grid">
               <div class="vector-card card-self interactive" data-edit-target="self" title="클릭하여 자아 다짐 수정">
                 <div class="vector-card-header">
-                  <span>자아 (Self)</span>
-                  <div style="display: flex; gap: 6px; align-items: center;">
-                    <span class="chronos-badge badge-mint">ACTIVE</span>
-                    <button class="card-edit-btn" data-edit-target="self"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
-                  </div>
+                  <span><svg class="icon"><use href="#icon-leaf"></use></svg> 자아</span>
+                  <button class="card-edit-btn" data-edit-target="self"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
                 </div>
-                <h4 class="vector-card-title" id="display-title-self"><svg class="icon"><use href="#icon-leaf"></use></svg> 나다움 성찰</h4>
                 <p id="display-goal-self" style="font-size: 0.88rem; color: var(--text-muted);">매일 30분 독서 및 온전한 생각 정리</p>
               </div>
-              
+
               <div class="vector-card card-family interactive" data-edit-target="family" title="클릭하여 가정 다짐 수정">
                 <div class="vector-card-header">
-                  <span>가정 (Family)</span>
-                  <div style="display: flex; gap: 6px; align-items: center;">
-                    <span class="chronos-badge badge-coral">PRIMARY</span>
-                    <button class="card-edit-btn" data-edit-target="family"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
-                  </div>
+                  <span><svg class="icon"><use href="#icon-home"></use></svg> 가정</span>
+                  <button class="card-edit-btn" data-edit-target="family"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
                 </div>
-                <h4 class="vector-card-title" id="display-title-family"><svg class="icon"><use href="#icon-home"></use></svg> 경청과 따뜻함</h4>
                 <p id="display-goal-family" style="font-size: 0.88rem; color: var(--text-muted);">가족과 따뜻한 저녁 식사와 깊은 경청</p>
               </div>
 
               <div class="vector-card card-society interactive" data-edit-target="society" title="클릭하여 사회 다짐 수정">
                 <div class="vector-card-header">
-                  <span>사회 (Society)</span>
-                  <div style="display: flex; gap: 6px; align-items: center;">
-                    <span class="chronos-badge badge-blue">FOCUS</span>
-                    <button class="card-edit-btn" data-edit-target="society"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
-                  </div>
+                  <span><svg class="icon"><use href="#icon-building"></use></svg> 사회</span>
+                  <button class="card-edit-btn" data-edit-target="society"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
                 </div>
-                <h4 class="vector-card-title" id="display-title-society"><svg class="icon"><use href="#icon-building"></use></svg> 사회적 기여</h4>
                 <p id="display-goal-society" style="font-size: 0.88rem; color: var(--text-muted);">동료의 이야기를 먼저 끝까지 경청하기</p>
               </div>
 
               <div class="vector-card card-soul interactive" data-edit-target="soul" title="클릭하여 영혼 다짐 수정">
                 <div class="vector-card-header">
-                  <span>영혼 (Soul)</span>
-                  <div style="display: flex; gap: 6px; align-items: center;">
-                    <span class="chronos-badge badge-mint">INNER</span>
-                    <button class="card-edit-btn" data-edit-target="soul"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
-                  </div>
+                  <span><svg class="icon"><use href="#icon-sparkle"></use></svg> 영혼</span>
+                  <button class="card-edit-btn" data-edit-target="soul"><svg class="icon"><use href="#icon-pen"></use></svg> 수정</button>
                 </div>
-                <h4 class="vector-card-title" id="display-title-soul"><svg class="icon"><use href="#icon-sparkle"></use></svg> 영혼의 평온</h4>
                 <p id="display-goal-soul" style="font-size: 0.88rem; color: var(--text-muted);">하루 5분 호흡과 명상으로 평온 지키기</p>
               </div>
             </div>
