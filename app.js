@@ -719,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const editGoalsModal = document.getElementById('edit-goals-modal');
 
   function openGoalsModal(focusTarget = null) {
-    document.getElementById('input-user-name').value = state.user_profile.user_id;
+    document.getElementById('input-user-name').value = state.user_profile.user_name || '';
     document.getElementById('input-oneword').value = state.user_profile.one_word;
     document.getElementById('input-oneword-quote').value = state.user_profile.one_word_quote;
     document.getElementById('input-goal-self').value = state.user_profile.four_area_goals.self;
