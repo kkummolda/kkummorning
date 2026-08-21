@@ -745,14 +745,6 @@ body {
   padding-top: 12px;
 }
 
-.btn-text-edit {
-  background: none;
-  border: none;
-  color: var(--accent-blue);
-  font-size: 13px;
-  cursor: pointer;
-}
-
 .goals-overview-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
