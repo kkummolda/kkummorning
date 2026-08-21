@@ -485,6 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateCharCounters();
+    updateFilledIndicators();
     updateSentencePreview();
   }
 
@@ -505,10 +506,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (counterSoul) counterSoul.textContent = `${soulInput.value.length}자`;
   }
 
+  // 이미 작성된 항목을 카드 테두리 + 체크 표시로 구분
+  function updateFilledIndicators() {
+    [selfInput, familyInput, societyInput, soulInput].forEach(el => {
+      if (!el) return;
+      const card = el.closest('.feedback-field-card');
+      if (card) card.classList.toggle('has-content', el.value.trim().length > 0);
+    });
+  }
+
   [selfInput, familyInput, societyInput, soulInput].forEach(el => {
     if (!el) return;
     el.addEventListener('input', () => {
       updateCharCounters();
+      updateFilledIndicators();
       triggerAutosaveIndicator();
     });
   });
